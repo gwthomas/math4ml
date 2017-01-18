@@ -1,0 +1,538 @@
+% arara: pdflatex
+% arara: bibtex
+% arara: pdflatex
+\documentclass{article}
+\title{Mathematics for Machine Learning}
+\author{Garrett Thomas\\
+Department of Electrical Engineering and Computer Sciences\\
+University of California, Berkeley}
+
+% useful packages
+\usepackage{amsfonts,amsmath,amssymb,amsthm,bm,commath,enumerate,graphicx,hyperref,physics}
+
+% formatting
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0em}
+\usepackage[margin=1.25in]{geometry}
+\hypersetup{
+    colorlinks=true,
+    linktoc=all,
+    linkcolor=black,
+    urlcolor=blue
+}
+
+% shorthand
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\dom}{dom}
+\DeclareMathOperator*{\range}{range}
+\DeclareMathOperator*{\diag}{diag}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\mat}[1]{\bm{#1}}
+\newcommand{\matlit}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand{\tran}{^\top}
+\newcommand{\inv}{^{-1}}
+\newcommand{\inner}[2]{\langle #1, #2 \rangle}
+\newcommand{\pr}[1]{\mathbb{P}(#1)}
+\renewcommand{\ev}[1]{\mathbb{E}[#1]}
+\newcommand{\evwrt}[2]{\mathbb{E}_{#1}[#2]}
+\renewcommand{\var}[1]{\operatorname{Var}(#1)}
+\newcommand{\cov}[2]{\operatorname{Cov}(#1, #2)}
+\newcommand{\bigpr}[1]{\mathbb{P}\left(#1\right)}
+\newcommand{\bigev}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\bigvar}[1]{\operatorname{Var}\left(#1\right)}
+\newcommand{\bigcov}[2]{\operatorname{Cov}\left(#1, #2\right)}
+\newcommand{\iid}{\overset{iid}{\sim}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\term}[1]{\textbf{#1}}
+\newcommand{\tab}{\hspace{0.5cm}}
+
+\begin{document}
+\maketitle
+
+\section{About}
+Machine learning uses tools from a variety of mathematical fields. This document is intended to summarize the mathematical background needed for an introductory class in machine learning, which at UC Berkeley is known as CS 189. We will cover topics in linear algebra, optimization, and probability. Our assumption is that the reader is already familiar with the basic concepts of multivariable calculus and linear algebra (at the level of UCB Math 53/54). We emphasize that this document is \textbf{not} a replacement for the prerequisite classes.
+
+You are free to distribute this document as you wish. Please report any mistakes to \url{gwthomas@berkeley.edu}.
+
+\newpage
+\tableofcontents
+
+\newpage
+\section{Notation}
+\begin{tabular}{|l|l|}
+\hline
+Notation & Meaning \\
+\hline
+$\R$ & set of real numbers \\
+$\R^n$ & set (vector space) of $n$-tuples of real numbers, endowed with the usual inner product \\
+$\R^{m \times n}$ & set (vector space) of $m$-by-$n$ matrices \\
+$\nabla f(\vec{x})$ & gradient of the function $f$ evaluated at $\vec{x}$ \\
+$\nabla^2 f(\vec{x})$ & Hessian of the function $f$ evaluated at $\vec{x}$ \\
+$A\tran$ & transpose of the matrix $A$ \\
+$\Omega$ & sample space \\
+$\pr{A}$ & probability of event $A$ \\
+$\pr{A \mid B}$ & probability of event $A$, given $B$ \\
+$p(X)$ & distribution of random variable $X$ \\
+$p(x)$ & probability density/mass function evaluated at $x$ \\
+$A^c$ & complement of event $A$ \\
+$\ev{X}$ & expected value of random variable $X$ \\
+$\var{X}$ & variance of random variable $X$ \\
+$\cov{X}{Y}$ & covariance of random variables $X$ and $Y$ \\
+\hline
+\end{tabular}
+
+\vspace{0.5cm}
+Other notes:
+\begin{itemize}
+\item Vectors are in bold (e.g. $\vec{x}$). This is true for vectors in $\R^n$ as well as for vectors in general vector spaces. We generally use Greek letters for scalars and capital Roman letters for matrices and random variables.
+
+\item To stay focused at an appropriate level of abstraction, we restrict ourselves to real values. In many places in this document, it is entirely possible to generalize to the complex case, but we will simply state the version that applies to the reals.
+
+\item We assume that vectors are column vectors, i.e. that a vector in $\R^n$ can be interpreted as an $n$-by-$1$ matrix. As such, taking the transpose of a vector is well-defined (and produces a row vector, which is a $1$-by-$n$ matrix).
+
+\item We do not provide proofs of most of the theorems/statements given in this document. The proofs are not the point -- our primary goal is to review important definitions and concepts.
+\end{itemize}
+
+\newpage
+\section{Linear Algebra}
+We begin by discussing important classes of spaces in which our data will live and our operations will take place: vector spaces, metric spaces, normed spaces, and inner product spaces. Generally speaking, these are defined in such a way as to capture one or more important properties of Euclidean space but generalize it.
+
+\subsection{Vector Spaces}
+\term{Vector spaces} are the basic setting in which linear algebra happens. A vector space $V$ is a set (the elements of which are called \term{vectors}) on which two operations are defined: vectors can be added together, and vectors can be multiplied by single real\footnote{More generally, vector spaces can be defined over any \term{field} $\F$. We take $\F = \R$ in this document to avoid an unnecessary diversion into abstract algebra.} numbers (called \term{scalars}). $V$ must satisfy
+\begin{enumerate}
+\item There exists an additive identity (written $\vec{0}$) in $V$ such that $\vec{x}+\vec{0} = \vec{x}$ for all $\vec{x} \in V$
+\item For each $\vec{x} \in V$, there exists an additive inverse (written $\vec{-x}$) such that $\vec{x}+(\vec{-x}) = \vec{0}$
+\item There exists a multiplicative identity (written $1$) in $\R$ such that $1\vec{x} = \vec{x}$ for all $\vec{x} \in V$
+\item Commutativity: $\vec{x}+\vec{y} = \vec{y}+\vec{x}$ for all $\vec{x}, \vec{y} \in V$
+\item Associativity: $(\vec{x}+\vec{y})+\vec{z} = \vec{x}+(\vec{y}+\vec{z})$ and $\alpha(\beta\vec{x}) = (\alpha\beta)\vec{x}$ for all $\vec{x}, \vec{y}, \vec{z} \in V$ and $\alpha, \beta \in \R$
+\item Distributivity: $\alpha(\vec{x}+\vec{y}) = \alpha\vec{x} + \alpha\vec{y}$ and $(\alpha+\beta)\vec{x} = \alpha\vec{x} + \beta\vec{x}$ for all $\vec{x}, \vec{y} \in V$ and $\alpha, \beta \in \R$
+\end{enumerate}
+We won't be using these axioms directly, but it is worth knowing them, or at least having an intuitive feeling for what they mean.
+
+\subsubsection{Euclidean Space}
+The quintessential vector space is \term{Euclidean space}, which we denote $\R^n$. The vectors in this space consist of $n$-tuples of real numbers:
+\[\vec{x} = (x_1, x_2, \dots, x_n)\]
+For our purposes, it will often be useful to think of them as $n \times 1$ matrices, or \term{column vectors}:
+\[\vec{x} = \matlit{x_1 \\ x_2 \\ \vdots \\ x_n}\]
+Addition and scalar multiplication are defined component-wise on vectors in $\R^n$:
+\[\vec{x} + \vec{y} = \matlit{x_1 + y_1 \\ \vdots \\ x_n + y_n}, \tab \alpha\vec{x} = \matlit{\alpha x_1 \\ \vdots \\ \alpha x_n}\]
+
+Euclidean space is used to mathematically represent physical space, with notions such as distance, length, and angles. Although it becomes hard to visualize for $n > 3$, these concepts generalize mathematically in obvious ways. Tip: even when you're working in more general settings than $\R^n$, it is often useful to visualize vector addition and scalar multiplication in terms of 2D vectors in the plane or 3D vectors in space.
+
+\subsection{Metric Spaces}
+Metrics generalize the notion of distance from Euclidean space.
+
+A \term{metric} on a set $S$ is a function $d : S \times S \to \R$ that satisfies
+\begin{enumerate}
+\item $d(x,y) \geq 0$, with equality if and only if $x = y$
+\item $d(x,y) = d(y,x)$
+\item $d(x,z) \leq d(x,y) + d(y,z)$ (the so-called \term{triangle inequality})
+\end{enumerate}
+for all $x, y, z \in S$.
+
+The key motivation for metrics is that they allow limits to be defined for mathematical objects other than real numbers. We say that a sequence $\{x_n\} \subseteq S$ converges to the limit $x$ if for any $\epsilon > 0$, there exists $N \in \N$ such that $d(x_n, x) < \epsilon$ for all $n \geq N$. Note that the definition for limits of sequences of real numbers, which you have likely seen in a calculus class, is a special case of this definition when using the metric $d(x, y) = |x-y|$.
+
+\subsection{Normed Spaces}
+Norms generalize the notion of length from Euclidean space.
+
+A \term{norm} on a real vector space $V$ is a function $\|\cdot\| : V \to \R$ that satisfies
+\begin{enumerate}
+\item $\|\vec{x}\| \geq 0$, with equality if and only if $\vec{x} = \vec{0}$
+\item $\|\alpha\vec{x}\| = |\alpha|\|\vec{x}\|$
+\item $\|\vec{x}+\vec{y}\| \leq \|\vec{x}\| + \|\vec{y}\|$ (the \term{triangle inequality} again)
+\end{enumerate}
+for all $\vec{x}, \vec{y} \in V$ and all $\alpha \in \R$. A vector space endowed with a norm is called a \term{normed vector space}, or simply a \term{normed space}.
+
+Note that any norm on $V$ induces a distance metric on $V$:
+\[d(\vec{x}, \vec{y}) = \|\vec{x}-\vec{y}\|\]
+One can verify that the axioms for metrics are satisfied under this definition and follow directly from the axioms for norms. Therefore any normed space is also a metric space.\footnote{If a normed space is complete with respect to the distance metric induced by its norm, we say that it is a \term{Banach space}.}
+
+We will typically only be concerned with a few specific norms on $\R^n$:
+\begin{align*}
+\|\vec{x}\|_1 &= \sum_{i=1}^n |x_i| \\
+\|\vec{x}\|_2 &= \sqrt{\sum_{i=1}^n x_i^2} \\
+\|\vec{x}\|_p &= \left(\sum_{i=1}^n |x_i|^p\right)^\frac{1}{p} \tab\tab (p \geq 1) \\
+\|\vec{x}\|_\infty &= \max_{1 \leq i \leq n} |x_i|
+\end{align*}
+Note that the 1- and 2-norms are special cases of the $p$-norm, and the $\infty$-norm is the limit of the $p$-norm as $p$ tends to infinity.
+
+Here's a fun fact: for any given finite-dimensional vector space $V$, all norms on $V$ are equivalent in the sense that for two norms $\|\cdot\|_A, \|\cdot\|_B$, there exist constants $\alpha, \beta > 0$ such that
+\[\alpha\|\vec{x}\|_A \leq \|\vec{x}\|_B \leq \beta\|\vec{x}\|_A\]
+for all $\vec{x} \in V$. Therefore convergence in one norm implies convergence in any other norm. This rule may not apply in infinite-dimensional vector spaces such as function spaces, though.
+
+\subsection{Inner Product Spaces}
+An \term{inner product} on a real vector space $V$ is a function $\inner{\cdot}{\cdot} : V \times V \to \R$ satisfying
+\begin{enumerate}
+\item $\inner{\vec{x}}{\vec{x}} \geq 0$, with equality if and only if $\vec{x} = \vec{0}$
+\item $\inner{\alpha\vec{x} + \beta\vec{y}}{\vec{z}} = \alpha\inner{\vec{x}}{\vec{z}} + \beta\inner{\vec{y}}{\vec{z}}$
+\item $\inner{\vec{x}}{\vec{y}} = \inner{\vec{y}}{\vec{x}}$
+\end{enumerate}
+for all $\vec{x}, \vec{y}, \vec{z} \in V$ and all $\alpha,\beta \in \R$. A vector space endowed with an inner product is called an \term{inner product space}.
+
+Note that any inner product on $V$ induces a norm on $V$:
+\[\|\vec{x}\| = \sqrt{\inner{\vec{x}}{\vec{x}}}\]
+One can verify that the axioms for norms are satisfied under this definition and follow directly from the axioms for inner products. Therefore any inner product space is also a normed space (and hence also a metric space).\footnote{If an inner product space is complete with respect to the distance metric induced by its inner product, we say that it is a \term{Hilbert space}.}
+
+Two vectors $\vec{x}$ and $\vec{y}$ are said to be \term{orthogonal} if $\inner{\vec{x}}{\vec{y}} = 0$. Orthogonality generalizes the notion of perpendicularity from Euclidean space. If two orthogonal vectors $\vec{x}$ and $\vec{y}$ additionally have unit length (i.e. $\|\vec{x}\| = \|\vec{y}\| = 1$), then they are described as \term{orthonormal}.
+
+The standard inner product on $\R^n$ is given by
+\[\inner{\vec{x}}{\vec{y}} = \sum_{i=1}^n x_iy_i = \vec{x}\tran\vec{y}\]
+The matrix notation on the righthand side (see the Transposition section if it's unfamiliar to you) arises because this inner product is a special case of matrix multiplication where we regard the resulting $1 \times 1$ matrix as a scalar. The inner product on $\R^n$ is also often written $\vec{x}\cdot\vec{y}$ (hence the alternate name \term{dot product}). The reader can verify that the two-norm $\|\cdot\|_2$ on $\R^n$ is induced by this inner product.
+
+\subsubsection{Pythagorean Theorem}
+The well-known Pythagorean theorem generalizes naturally to arbitrary inner product spaces: if $\inner{\vec{x}}{\vec{y}} = 0$, then
+\[\|\vec{x}+\vec{y}\|^2 = \|\vec{x}\|^2 + \|\vec{y}\|^2\]
+\begin{proof}
+Suppose $\inner{\vec{x}}{\vec{y}} = 0$. Then
+\[\|\vec{x}+\vec{y}\|^2 = \inner{\vec{x}+\vec{y}}{\vec{x}+\vec{y}} = \inner{\vec{x}}{\vec{x}} + \inner{\vec{y}}{\vec{x}} + \inner{\vec{x}}{\vec{y}} + \inner{\vec{y}}{\vec{y}} = \|\vec{x}\|^2 + \|\vec{y}\|^2\]
+as claimed.
+\end{proof}
+
+\subsubsection{Cauchy-Schwarz Inequality}
+This inequality is sometimes useful in proving bounds:
+\[|\inner{\vec{x}}{\vec{y}}| \leq \|\vec{x}\| \cdot \|\vec{y}\|\]
+for all $\vec{x}, \vec{y} \in V$. Equality holds exactly when $\vec{x}$ and $\vec{y}$ are scalar multiples of each other (or equivalently, when they are linearly dependent).
+
+\subsection{Transposition}
+If $A \in \R^{m \times n}$, its \term{transpose} $A\tran \in \R^{n \times m}$ is given by $(A\tran)_{ij} = A_{ji}$ for each $(i, j)$. In other words, the columns of $A$ become the rows of $A\tran$, and the rows of $A$ become the columns of $A\tran$.
+
+The transpose has several nice algebraic properties that can be easily verified from the definition:
+\begin{enumerate}
+\item $(A\tran)\tran = A$
+\item $(A+B)\tran = A\tran + B\tran$
+\item $(\alpha A)\tran = \alpha A\tran$
+\item $(AB)\tran = B\tran A\tran$
+\end{enumerate}
+
+\subsection{Eigenthings}
+For a square matrix $A \in \R^{n \times n}$, there may be vectors which, when $A$ is applied to them, are simply scaled by some constant. We say that a nonzero vector $\vec{x} \in \R^n$ is an \term{eigenvector} of $A$ corresponding to \term{eigenvalue} $\lambda$ if
+\[A\vec{x} = \lambda\vec{x}\]
+The zero vector is excluded from this definition because $A\vec{0} = \vec{0} = \lambda\vec{0}$ for every $\lambda$.
+
+\subsection{Trace}
+The \term{trace} of a matrix is the sum of its diagonal entries:
+\[\tr(A) = \sum_{i=1}^n a_{ii}\]
+The trace has several nice algebraic properties, most of which can be easily verified from the definition:
+\begin{enumerate}
+\item $\tr(A+B) = \tr(A) + \tr(B)$
+\item $\tr(\alpha A) = \alpha\tr(A)$
+\item $\tr(A\tran) = \tr(A)$
+\item $\tr(ABCD) = \tr(BCDA) = \tr(CDAB) = \tr(BADC)$
+\end{enumerate}
+This last property is known as \term{invariance under cyclic permutations}. Note that the matrices cannot be reordered arbitrarily, for example $\tr(ABCD) \neq \tr(BACD)$ in general.
+
+Interestingly, the trace of a matrix is equal to the sum of its eigenvalues (repeated according to multiplicity):
+\[\tr(A) = \sum_i \lambda_i\]
+
+\subsection{Determinant}
+The \term{determinant} of a matrix can be defined in several different confusing ways, none of which are particularly important for our purposes; go look at an introductory linear algebra text (or Wikipedia) if you need a definition. But it's good to know the properties:
+\begin{enumerate}
+\item $\det(I) = 1$
+\item $\det(A\tran) = \det(A)$
+\item $\det(AB) = \det(A)\det(B)$
+\item $\det(A\inv) = \det(A)\inv$
+\item $\det(\alpha A) = \alpha^n \det(A)$
+\end{enumerate}
+Interestingly, the determinant of a matrix is equal to the product of its eigenvalues (repeated according to multiplicity):
+\[\det(A) = \prod_i \lambda_i\]
+
+\subsection{Special Kinds of Matrices}
+There are several ways matrices can be classified. Each categorization implies some potentially desirable properties, so it's always good to know what kind of matrix you're dealing with.
+
+\subsubsection{Orthogonal Matrices}
+A matrix $Q \in \R^{n \times n}$ is said to be \term{orthogonal} if its columns are pairwise orthonormal. This definition implies that
+\[Q\tran Q = QQ\tran = I\]
+or equivalently, $Q\tran = Q^{-1}$. A nice thing about orthogonal matrices is that they preserve inner products:
+\[(Q\vec{x})\tran(Q\vec{y}) = \vec{x}\tran Q\tran Q\vec{y} = \vec{x}\tran I\vec{y} = \vec{x}\tran\vec{y}\]
+A direct result of this fact is that they also preserve 2-norms:
+\[\|Q\vec{x}\|_2 = \sqrt{(Q\vec{x})\tran(Q\vec{x})} = \sqrt{\vec{x}\tran\vec{x}} = \|\vec{x}\|_2\]
+Therefore multiplication by an orthogonal matrix can be considered as a transformation that preserves length, but may ``rotate'' the vector about the origin.
+
+\subsubsection{Symmetric Matrices}
+A matrix $A \in \R^{n \times n}$ is said to be \term{symmetric} if it is equal to its own transpose ($A = A\tran$). A very important property of symmetric matrices is that they can be decomposed in the following manner:
+\[A = Q\Lambda Q\tran\]
+Here $Q$ is an orthogonal matrix, and $\Lambda = \diag(\lambda_1, \dots, \lambda_n)$, where $\lambda_1, \dots, \lambda_n$ are the eigenvalues of $A$. This is referred to as the \term{eigendecomposition} or \term{spectral decomposition} of $A$.
+
+\subsubsection{Positive (Semi-)Definite Matrices}
+A symmetric matrix $A$ is \term{positive definite} if for all nonzero $\vec{x} \in \R^n$, $\vec{x}\tran A\vec{x} > 0$. Sometimes people write $A \succ 0$ to indicate that $A$ is positive definite. Positive definite matrices have all positive eigenvalues.
+
+A symmetric matrix $A$ is \term{positive semi-definite} if for all $\vec{x} \in \R^n$, $\vec{x}\tran A\vec{x} \geq 0$. Sometimes people write $A \succeq 0$ to indicate that $A$ is positive semi-definite. Positive semi-definite matrices have all nonnegative eigenvalues.
+
+Positive definite and positive semi-definite matrices will come up very frequently! Note that since these matrices are also symmetric, the properties of symmetric matrices apply here as well.
+
+As an example of how these matrices arise, the matrix $A\tran A$ is positive semi-definite for any $A \in \R^{m \times n}$, since
+\[\vec{x}\tran (A\tran A)\vec{x} = (A\vec{x})\tran(A\vec{x}) = \|A\vec{x}\|_2^2 \geq 0\]
+for any $\vec{x} \in \R^n$.
+
+\subsection{Singular Value Decomposition}
+Singular value decomposition (SVD) is a widely applicable tool in linear algebra. Its strength stems partially from the fact that \textit{every matrix} $A \in \R^{m \times n}$ has an SVD (even non-square matrices)! The decomposition goes as follows:
+\[A = U\Sigma V\tran\]
+where $U \in \R^{m \times m}$ and $V \in \R^{n \times n}$ are orthogonal matrices and $\Sigma \in \R^{m \times n}$ is a diagonal matrix\footnote{Some would protest that a diagonal matrix must be square. We simply mean that all the off-diagonal entries are zero.} with the \term{singular values} of $A$ (denoted $\sigma_i$) on its diagonal. By convention, the singular values are given in non-increasing order, i.e.
+\[\sigma_1 \geq \sigma_2 \geq \dots \geq \sigma_{\min(m,n)} \geq 0\]
+Only the first $r$ singular values are nonzero, where $r$ is the rank of $A$.
+
+The singular values of $A$ are the square roots of the eigenvalues of $A\tran A$ (or equivalently, of $AA\tran$).
+
+The columns of $U$ are called the \term{left-singular vectors} of $A$, and they are eigenvectors of $AA\tran$. (Try showing this!) The columns of $V$ are called the \term{right-singular vectors} of $A$, and they are eigenvectors of $A\tran A$.
+
+There is another useful way to write the SVD:
+\[A = \sum_{i=1}^r \sigma_i \vec{u}_i\vec{v}_i\tran\]
+
+\newpage
+\section{Calculus and optimization}
+Much of machine learning is about minimizing a \term{cost function} (also called an \term{objective function} in the optimization community), which is a scalar function of several variables that typically measures how poorly our model fits the data we have. We will not give specific examples of cost functions here (go to class for these!) but we will assume that our cost function has the form $f : \R^n \to \R$ and is sufficiently differentiable.
+
+\subsection{Extrema}
+Optimization is about finding \term{extrema}, which depending on the application could be minima or maxima. A point $\vec{x}$ is said to be a \term{local minimum} (resp. \term{local maximum}) of $f$ if $f(\vec{x}) \leq f(\vec{y})$ (resp. $f(\vec{x}) \geq f(\vec{y})$) for all $\vec{y}$ in some neighborhood about $\vec{x}$. Furthermore, if $f(\vec{x}) \leq f(\vec{y})$ for all $\vec{y}$ in the entire domain of $f$, then $\vec{x}$ is a \term{global minimum} of $f$ (similarly for global maximum).
+
+\subsection{Gradients}
+The single most important concept from calculus in the context of machine learning is the \term{gradient}. Gradients generalize derivatives to scalar functions of several variables. The gradient of $f$, denoted $\nabla f$, is given by
+\[\nabla f = \matlit{\pdv{f}{x_1} \\ \vdots \\ \pdv{f}{x_n}}\]
+Gradients have the following very important property: $\nabla f(\vec{x})$ points in the direction of \term{steepest ascent} from $\vec{x}$:
+\begin{center}
+\includegraphics[width=0.9\linewidth]{gradient.png}
+\end{center}
+We will use this fact frequently when iteratively minimizing a function via \term{gradient descent}.
+
+\subsection{Hessians}
+The \term{Hessian} is a matrix of second-order partial derivatives:
+\[\nabla^2 f = \matlit{
+	\pdv[2]{f}{x_1} & \hdots & \pdv{f}{x_1}{x_n} \\
+	\vdots & \ddots & \vdots \\
+	\pdv{f}{x_n}{x_1} & \hdots & \pdv[2]{f}{x_n}
+}\]
+i.e.
+\[(\nabla^2 f)_{ij} = \pdv{f}{x_i}{x_j}\]
+The Hessian is used in some optimization algorithms, such as Newton's method. It is expensive to calculate but can drastically reduce the number of iterations needed to converge to a local minimum by providing information about the curvature of $f$.
+
+\subsection{Taylor's theorem}
+Taylor's theorem has natural generalizations to functions of more than one variable. One version states
+\[f(\vec{x} + \vec{y}) = f(\vec{x}) + \nabla f(\vec{x} + \alpha\vec{y})\tran\vec{y}\]
+for some $\alpha \in (0,1)$. Furthermore, if $f$ is twice-differentiable, we have
+\[f(\vec{x} + \vec{y}) = f(\vec{x}) + \nabla f(\vec{x})\tran\vec{y} + \frac{1}{2}\vec{y}\tran\nabla^2f(\vec{x}+\alpha\vec{y})\vec{y}\]
+for some $\alpha \in (0,1)$.
+
+This theorem is used in proofs about necessary and sufficient conditions for local optima. We don't reproduce the proofs here, but the interested reader can consult \cite{numopt}.
+
+Here is an example of such a useful fact: if $f$ is differentiable, then for any extremum $\vec{x}$, $\nabla f(\vec{x}) = \vec{0}$. Note that the converse does not hold in general, that is, $\nabla f(\vec{x}) = \vec{0}$ does not necessarily imply that $\vec{x}$ is an extremum. (It could be a \term{saddle point} of $f$.)
+
+\subsection{Convexity}
+A function $f$ is said to be \term{convex} if
+\[f(\alpha\vec{x} + (1-\alpha)\vec{y}) \leq \alpha f(\vec{x}) + (1-\alpha)f(\vec{y})\]
+for all $\vec{x}, \vec{y} \in \dom f$ and any $\alpha \in [0,1]$. Geometrically, this means that the line segment between two points on the graph of $f$ lies on or above the graph itself:
+\begin{center}
+\includegraphics[width=0.9\linewidth]{convex}
+\end{center}
+We say that a function is \term{concave} if its negation is convex.
+
+There are a number of ways to show that a function is convex:
+\begin{enumerate}[(i)]
+\item If $f$ is differentiable, then it is convex on an interval if and only if its derivative is non-decreasing on that interval.
+\item If $f$ is continuously differentiable, then it is convex on an interval if and only if
+\[f(x) \geq f(y) + f'(y)(x-y)\]
+for all $x,y$ in the interval.
+\item If $f$ is twice differentiable, then it is convex on some convex set if and only if the Hessian $\nabla^2 f$ is positive semi-definite on the interior of that set.
+\item If $f$ is convex and $c \geq 0$, then $cf$ is convex.
+\item If $f$ and $g$ are convex, then $f+g$ is convex.
+\item If $f$ is convex, then $g(\vec{x}) \equiv f(A\vec{x} + \vec{b})$ is convex for any $A$ and $\vec{b}$.
+\item If $f$ and $g$ are convex, then $h(\vec{x}) \equiv \max\{f(\vec{x}), g(\vec{x})\}$ is convex.
+\end{enumerate}
+
+Convexity sounds at first like a very mysterious property, but it has some wonderful implications. A particularly nice consequence is that any local minimum of a convex function $f$ is a global minimum of $f$! Generally speaking, the minimization of convex functions is much better understood than minimization of general nonlinear functions.
+
+Unfortunately, many loss functions that we would like to minimize are non-convex (e.g. for training neural networks). This means whatever local minima our optimization algorithm finds may not be globally optimal.
+
+\newpage
+\section{Probability}
+Probability theory provides powerful tools for modeling and dealing with uncertainty. In machine learning, we will use it extensively, particularly to construct and analyze classifiers.
+
+\subsection{Basics}
+Suppose we have some sort of randomized experiment (e.g. a coin toss, die roll) that has a fixed set of possible outcomes.  We call this set the \term{sample space} and denote it $\Omega$. Any subset $A \subseteq \Omega$ is called an \term{event}.
+A \term{probability distribution} over $\Omega$ specifies how likely each event is to occur. We write $\pr{A}$ for the probability of event $A$.
+
+Here are the basic axioms of probability:
+\begin{enumerate}
+\item For any event $A \subseteq \Omega$, $\pr{A} \geq 0$
+\item $\pr{\Omega} = 1$
+\item If $A_1, \dots, A_n$ are \term{mutually exclusive}, i.e. $A_i \cap A_j = \varnothing$ for $i \neq j$, then
+\[\pr{A_1 \cup \cdots \cup A_n} = \pr{A_1} + \cdots + \pr{A_n}\]
+\end{enumerate}
+From these axioms, a number of useful rules can be derived (see \cite{pitman}):
+\begin{enumerate}
+\item $\pr{\varnothing} = 0$
+\item If $A \subseteq B$, then $\pr{A} \leq \pr{B}$
+\item $\pr{A \cup B} = \pr{A} + \pr{B} - \pr{A \cap B}$
+\item $\pr{A} + \pr{A^c} = 1$
+\end{enumerate}
+
+\subsubsection{Conditional Probability}
+The \term{conditional probability} of event $A$ given that event $B$ has occurred is written $\pr{A \mid B}$ and defined as
+\[\pr{A \mid B} = \frac{\pr{A \cap B}}{\pr{B}}\]
+assuming $\pr{B} > 0$.
+
+\subsubsection{Chain Rule}
+Another very useful tool, the \term{chain rule}, follows immediately from this definition:
+\[\pr{A \cap B} = \pr{A \mid B}\pr{B} = \pr{B \mid A}\pr{A}\]
+
+\subsubsection{Bayes' Rule}
+Taking the equality from above one step further, we arrive at the simple but crucial \term{Bayes' rule}:
+\[\pr{A \mid B} = \frac{\pr{B \mid A}\pr{A}}{\pr{B}}\]
+It is sometimes beneficial to omit the normalizing constant and write
+\[\pr{A \mid B} \propto \pr{A}\pr{B \mid A}\]
+Under this formulation, $\pr{A}$ is often referred to as the \term{prior} and $\pr{B \mid A}$ as the \term{likelihood}.
+
+In the context of machine learning, we can use Bayes' rule to update our ``beliefs'' (e.g. values of our model parameters) given some data that we've observed.
+
+\subsection{Random Variables}
+A \term{random variable} (r.v.) is some uncertain quantity with an associated probability distribution over the values it can assume. We write $X \sim p(\cdot)$ to indicate that the random variable $X$ is distributed according to some probability mass/density function $p$ (more on these functions below).
+
+Formally, a random variable is a function from the sample space $\Omega$ to some other set of values, which we denote $X(\Omega) = \{X(\omega) \mid \omega \in \Omega\}$. To give a concrete example (taken from \cite{pitman}), suppose $X$ is the number of heads in two tosses of a fair coin. The sample space is
+\[\Omega = \{hh, tt, ht, th\}\]
+and $X$ is determined completely by the outcome $\omega$, i.e. $X = X(\omega)$. Moreover, we see the fundamental way that a random variable relates back to its underlying sample space:
+\[\pr{X = x} = \pr{\{\omega \in \Omega \mid X(\omega) = x\}}\]
+Typically we work only with random variables and don't concern ourselves with the original sample space $\Omega$, but it's worth knowing that it really is there behind the scenes.
+
+A word on notation: we write $p(X)$ to denote the entire probability distribution of $X$ and $p(x)$ for the evaluation of the function $p$ at a particular value $x \in X(\Omega)$. Hopefully this (reasonably standard) abuse of notation is not too distracting. If $p$ is parameterized by some parameters $\theta$, we write $p(X; \vec{\theta})$ or $p(x; \vec{\theta})$, unless we are in a Bayesian setting where the parameters are considered a random variable, in which case we condition on the parameters.
+
+\subsubsection{Discrete Random Variables}
+Discrete random variables are usually specified by a nonnegative \term{probability mass function} (p.m.f.) $p$ which satisfies
+\[\sum_{x \in X(\Omega)} p(x) = 1\]
+For a discrete $X$, the probability of a particular value is given exactly by its p.m.f.:
+\[\pr{X = x} = p(x)\]
+
+\subsubsection{Continuous Random Variables}
+Continuous random variables are usually specified by a nonnegative \term{probability density function} (p.d.f.) $p$ which satisfies
+\[\int_{X(\Omega)} p(x) \dif{x} = 1\]
+For a continuous $X$, the probability of a particular value is zero ($\forall x \in X(\Omega)$, $\pr{X = x} = 0$), so to get a positive probability we must integrate the p.d.f. over some range of values:
+\[\pr{a \leq X \leq b} = \int_a^b p(x)\dif{x}\]
+
+\subsubsection{The Cumulative Distribution Function}
+The \term{cumulative distribution function} (c.d.f.) gives the probability that a random variable is at most a certain value:
+\[F_X(x) = \pr{X \leq x}\]
+The c.d.f. can be used to give the probability that a variable lies within a certain range:
+\[\pr{a < X \leq b} = F_X(b) - F_X(a)\]
+
+\subsection{Joint Distributions}
+Often we have several random variables and we would like to get a distribution over some combination of them. A \term{joint distribution} is exactly this. For some random variables $X_1, \dots, X_n$, the joint distribution is written $p(X_1, \dots, X_n)$ and gives probabilities over entire assignments to all the $X_i$ simultaneously.
+
+\subsubsection{Independence of Random Variables}
+We say that two variables $X$ and $Y$ are \term{independent} if their joint distribution factors into their respective distributions, i.e.
+\[p(X, Y) = p(X)p(Y)\]
+It is often convenient (though perhaps questionable) to assume that a bunch of random variables are \term{independent and identically distributed} (i.i.d.) so that their joint distribution can be factored entirely:
+\[p(X_1, \dots, X_n) = \prod_{i=1}^n p(X_i)\]
+where $X_1, \dots, X_n$ all share the same p.m.f./p.d.f.
+
+\subsubsection{Marginal Distributions}
+If we have a joint distribution over some set of random variables, it is possible to obtain a distribution for a subset of them by ``summing out'' (or ``integrating out'' in the continuous case) the variables we don't care about:
+\[p(X) = \sum_{y} p(X, y)\]
+
+\subsection{Great Expectations}
+If we have some random variable $X$, we might be interested in knowing what is the ``average'' value of $X$. This concept is captured by the \term{expected value} (or \term{mean}) $\ev{X}$, which is defined as
+\[\ev{X} = \sum_{x \in X(\Omega)} xp(x)\]
+for discrete $X$ and as
+\[\ev{X} = \int_{X(\Omega)} xp(x)\dif{x}\]
+for continuous $X$.
+
+In words, we are taking a weighted sum of the values that $X$ can take on, where the weights are the probabilities of those respective values. The expected value has a physical interpretation as the ``center of mass'' of the distribution.
+
+\subsubsection{Properties of Expected Value}
+A very useful property of expectation is that of linearity:
+\[\bigev{\sum_{i=1}^n \alpha_i X_i + \beta} = \sum_{i=1}^n \alpha_i \ev{X_i} + \beta\]
+Note that this holds even if the $X_i$ are not independent!
+
+But if they are independent, the product rule also holds:
+\[\bigev{\prod_{i=1}^n X_i} = \prod_{i=1}^n \ev{X_i}\]
+
+\subsection{Variance}
+Expectation provides a measure of the ``center'' of a distribution, but frequently we are also interested in what the ``spread'' is about that center. We define the variance $\var{X}$ of a random variable $X$ by
+\[\var{X} = \bigev{\left(X - \ev{X}\right)^2}\]
+In words, this is the average squared deviation of the values of $X$ from the mean of $X$. Using a little algebra and the linearity of expectation, it is straightforward to show that
+\[\var{X} = \ev{X^2} - \ev{X}^2\]
+
+\subsubsection{Properties of Variance}
+Variance is not linear (because of the squaring in the definition), but one can show the following:
+\[\var{\alpha X + \beta} = \alpha^2 \var{X}\]
+Basically, multiplicative constants become squared when they are pulled out, and additive constants disappear (since the variance contributed by a constant is zero).
+
+Furthermore, if $X_1, \dots, X_n$ are uncorrelated\footnote{We haven't defined this yet; see the Correlation section below}, then
+\[\var{X_1 + \dots + X_n} = \var{X_1} + \dots + \var{X_n}\]
+
+\subsubsection{Standard Deviation}
+Variance is a useful notion, but it suffers from that fact the units of variance are not the same as the units of the random variable (again because of the squaring). To overcome this problem we can use \term{standard deviation}, which is defined as $\sqrt{\var{X}}$. The standard deviation of $X$ has the same units as $X$.
+
+\subsection{Covariance}
+Covariance is a measure of the linear relationship between two random variables. We denote the covariance between $X$ and $Y$ as $\cov{X}{Y}$, and it is defined to be
+\[\cov{X}{Y} = \ev{(X-\ev{X})(Y-\ev{Y})}\]
+Note that the outer expectation must be taken over the joint distribution of $X$ and $Y$.
+
+Again, the linearity of expectation allows us to rewrite this as
+\[\cov{X}{Y} = \ev{XY} - \ev{X}\ev{Y}\]
+Comparing these formulas to the ones for variance, it is not hard to see that $\var{X} = \cov{X}{X}$.
+
+\subsubsection{Correlation}
+Normalizing the covariance gives the \term{correlation}:
+\[\rho(X, Y) = \frac{\cov{X}{Y}}{\sqrt{\var{X}\var{Y}}}\]
+Correlation also measures the linear relationship between two variables, but unlike covariance always lies between $-1$ and $1$.
+
+Two variables are said to be \term{uncorrelated} if $\cov{X}{Y} = 0$ because $\cov{X}{Y} = 0$ implies that $\rho(X, Y) = 0$. If two variables are independent, then they are uncorrelated, but the converse does not hold in general.
+
+\subsection{Random Vectors}
+So far we have been talking about \term{univariate distributions}, that is, distributions of single variables. But we can also talk about \term{multivariate distributions} which give distributions of \term{random vectors}:
+\[\bX = \matlit{X_1 \\ \vdots \\ X_n}\]
+The metrics we have discussed for single variables have natural generalizations to the multivariate case.
+
+Expectation of a random vector is simply the expectation applied to each component:
+\[\ev{\bX} = \matlit{\ev{X_1} \\ \vdots \\ \ev{X_n}}\]
+
+The variance is generalized by the \term{covariance matrix}:
+\[\Sigma = \ev{(\bX - \ev{\bX})(\bX - \ev{\bX})\tran} = \matlit{
+\var{X_1} & \cov{X_1}{X_2} & \hdots & \cov{X_1}{X_n} \\
+\cov{X_2}{X_1} & \var{X_2} & \hdots & \cov{X_2}{X_n} \\
+\vdots & \vdots & \ddots & \vdots \\
+\cov{X_n}{X_1} & \cov{X_n}{X_2} & \hdots & \var{X_n}
+}\]
+We see $\Sigma_{ij} = \cov{X_i}{X_j}$. Since covariance is symmetric in its arguments, the covariance matrix is also symmetric. It's also positive semi-definite: for any $\vec{x}$,
+\[\vec{x}\tran\Sigma\vec{x} = \vec{x}\tran\ev{(\bX - \ev{\bX})(\bX - \ev{\bX})\tran}\vec{x} = \ev{\vec{x}\tran(\bX - \ev{\bX})(\bX - \ev{\bX})\tran\vec{x}} = \ev{((\bX - \ev{\bX})\tran\vec{x})^2} \geq 0\]
+
+The inverse of the covariance matrix, $\Sigma\inv$, is sometimes called the \term{precision matrix}.
+
+\subsection{Estimation of Parameters}
+Now we get into some basic topics from statistics. We make some assumptions about our problem by prescribing a \term{parametric} model (e.g. a distribution that describes how the data were generated), then we fit the parameters of the model to the data. How do we choose the values of the parameters?
+
+\subsubsection{Maximum Likelihood Estimation}
+A common way to fit parameters is \term{maximum likelihood estimation} (MLE). The basic principle of MLE is to choose values that ``explain'' the data best by maximizing the probability of the data we've seen, conditioned on the parameters. Suppose we have random variables $X_1, \dots, X_n$ and corresponding observations $x_1, \dots, x_n$. Then
+\[\hat{\vec{\theta}}_\textsc{mle} = \argmax_\vec{\theta} \mathcal{L}(\vec{\theta})\]
+where $\mathcal L$ is the \term{likelihood function}
+\[\mathcal{L}(\vec{\theta}) = p(x_1, \dots, x_n; \vec{\theta})\]
+Often, we assume that $X_1, \dots, X_n$ are i.i.d. Then we can write
+\[p(x_1, \dots, x_n; \theta) = \prod_{i=1}^n p(x_i; \vec{\theta})\]
+At this point, it is usually convenient to take logs, giving rise to the \term{log-likelihood}
+\[\log\mathcal{L}(\vec{\theta}) = \sum_{i=1}^n \log p(x_i; \vec{\theta})\]
+This is a valid operation because the probabilities/densities are assumed to be positive, and since log is a monotonically increasing function, it preserves ordering. In other words, any maximizer of $\log \mathcal L$ will also maximize $\mathcal L$.
+
+For some distributions, it is possible to analytically solve for the maximum likelihood estimator. If $\log\mathcal{L}$ is differentiable, setting the derivatives to zero and trying to solve for $\vec{\theta}$ is a good place to start.
+
+\subsubsection{Maximum a Posteriori Estimation}
+A more Bayesian way to fit parameters is through \term{maximum a posteriori estimation} (MAP). In this technique we assume that the parameters are a random variable, and we specify a prior distribution $p(\vec{\theta})$. Then we can employ Bayes' rule to compute the posterior distribution of the parameters given the observed data:
+\[p(\vec{\theta} \mid x_1, \dots, x_n) \propto p(\vec{\theta})p(x_1, \dots, x_n \mid \vec{\theta})\]
+Computing the normalizing constant is often intractable, because it involves integrating over the parameter space, which may be very high-dimensional. Fortunately, if we just want the MAP estimate, we don't care about the normalizing constant! It does not affect which values of $\vec{\theta}$ maximize the posterior. So we have
+\[\hat{\vec{\theta}}_\textsc{map} = \argmax_\vec{\theta} p(\vec{\theta})p(x_1, \dots, x_n \mid \vec{\theta})\]
+Again, if we assume $x_1, \dots, x_n$ are i.i.d., then we can express this in the equivalent, and possibly friendlier, form
+\[\hat{\vec{\theta}}_\textsc{map} = \argmax_\vec{\theta} \left(\log p(\vec{\theta}) + \sum_{i=1}^n \log p(x_i \mid \vec{\theta})\right)\]
+A particularly nice case is when the prior is chosen carefully such that the posterior comes from the same family as the prior. In this case the prior is called a \term{conjugate prior}. For example, if the likelihood is binomial and the prior is beta, the posterior is also beta. There are many conjugate priors; the reader may find this \href{https://en.wikipedia.org/wiki/Conjugate_prior#Table_of_conjugate_distributions}{table of conjugate priors} useful.
+
+\newpage
+\bibliography{references}
+\addcontentsline{toc}{section}{References}
+\bibliographystyle{ieeetr}
+\nocite{*}
+%\begin{thebibliography}{9}
+%\bibitem{boydvandenberghe}
+%Something
+%\end{thebibliography}
+
+\end{document}
