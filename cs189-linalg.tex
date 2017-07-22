@@ -1,0 +1,285 @@
+In this section we present important classes of spaces in which our data will live and our operations will take place: vector spaces, metric spaces, normed spaces, and inner product spaces.
+Generally speaking, these are defined in such a way as to capture one or more important properties of Euclidean space but in a more general way.
+
+\subsection{Vector spaces}
+\term{Vector spaces} are the basic setting in which linear algebra happens.
+A vector space $V$ is a set (the elements of which are called \term{vectors}) on which two operations are defined: vectors can be added together, and vectors can be multiplied by real numbers\footnote{
+    More generally, vector spaces can be defined over any \term{field} $\F$.
+    We take $\F = \R$ in this document to avoid an unnecessary diversion into abstract algebra.
+} called \term{scalars}.
+$V$ must satisfy
+\begin{enumerate}
+\item There exists an additive identity (written $\vec{0}$) in $V$ such that $\x+\vec{0} = \x$ for all $\x \in V$
+\item For each $\x \in V$, there exists an additive inverse (written $\vec{-x}$) such that $\x+(\vec{-x}) = \vec{0}$
+\item There exists a multiplicative identity (written $1$) in $\R$ such that $1\x = \x$ for all $\x \in V$
+\item Commutativity: $\x+\y = \y+\x$ for all $\x, \y \in V$
+\item Associativity: $(\x+\y)+\vec{z} = \x+(\y+\vec{z})$ and $\alpha(\beta\x) = (\alpha\beta)\x$ for all $\x, \y, \vec{z} \in V$ and $\alpha, \beta \in \R$
+\item Distributivity: $\alpha(\x+\y) = \alpha\x + \alpha\y$ and $(\alpha+\beta)\x = \alpha\x + \beta\x$ for all $\x, \y \in V$ and $\alpha, \beta \in \R$
+\end{enumerate}
+
+\subsubsection{Euclidean space}
+The quintessential vector space is \term{Euclidean space}, which we denote $\R^n$.
+The vectors in this space consist of $n$-tuples of real numbers:
+\[\x = (x_1, x_2, \dots, x_n)\]
+For our purposes, it will be useful to think of them as $n \times 1$ matrices, or \term{column vectors}:
+\[\x = \matlit{x_1 \\ x_2 \\ \vdots \\ x_n}\]
+Addition and scalar multiplication are defined component-wise on vectors in $\R^n$:
+\[\x + \y = \matlit{x_1 + y_1 \\ \vdots \\ x_n + y_n}, \tab \alpha\x = \matlit{\alpha x_1 \\ \vdots \\ \alpha x_n}\]
+Euclidean space is used to mathematically represent physical space, with notions such as distance, length, and angles.
+Although it becomes hard to visualize for $n > 3$, these concepts generalize mathematically in obvious ways.
+Tip: even when you're working in more general settings than $\R^n$, it is often useful to visualize vector addition and scalar multiplication in terms of 2D vectors in the plane or 3D vectors in space.
+
+\subsection{Metric spaces}
+Metrics generalize the notion of distance from Euclidean space (although metric spaces need not be vector spaces).
+
+A \term{metric} on a set $S$ is a function $d : S \times S \to \R$ that satisfies
+\begin{enumerate}
+\item $d(x,y) \geq 0$, with equality if and only if $x = y$
+\item $d(x,y) = d(y,x)$
+\item $d(x,z) \leq d(x,y) + d(y,z)$ (the so-called \term{triangle inequality})
+\end{enumerate}
+for all $x, y, z \in S$.
+
+A key motivation for metrics is that they allow limits to be defined for mathematical objects other than real numbers.
+We say that a sequence $\{x_n\} \subseteq S$ converges to the limit $x$ if for any $\epsilon > 0$, there exists $N \in \N$ such that $d(x_n, x) < \epsilon$ for all $n \geq N$.
+Note that the definition for limits of sequences of real numbers, which you have likely seen in a calculus class, is a special case of this definition when using the metric $d(x, y) = |x-y|$.
+
+\subsection{Normed spaces}
+Norms generalize the notion of length from Euclidean space.
+
+A \term{norm} on a real vector space $V$ is a function $\|\cdot\| : V \to \R$ that satisfies
+\begin{enumerate}
+\item $\|\x\| \geq 0$, with equality if and only if $\x = \vec{0}$
+\item $\|\alpha\x\| = |\alpha|\|\x\|$
+\item $\|\x+\y\| \leq \|\x\| + \|\y\|$ (the \term{triangle inequality} again)
+\end{enumerate}
+for all $\x, \y \in V$ and all $\alpha \in \R$.
+A vector space endowed with a norm is called a \term{normed vector space}, or simply a \term{normed space}.
+
+Note that any norm on $V$ induces a distance metric on $V$:
+\[d(\x, \y) = \|\x-\y\|\]
+One can verify that the axioms for metrics are satisfied under this definition and follow directly from the axioms for norms.
+Therefore any normed space is also a metric space.\footnote{
+    If a normed space is complete with respect to the distance metric induced by its norm, we say that it is a \term{Banach space}.
+}
+
+We will typically only be concerned with a few specific norms on $\R^n$:
+\begin{align*}
+\|\x\|_1 &= \sum_{i=1}^n |x_i| \\
+\|\x\|_2 &= \sqrt{\sum_{i=1}^n x_i^2} \\
+\|\x\|_p &= \left(\sum_{i=1}^n |x_i|^p\right)^\frac{1}{p} \tab\tab (p \geq 1) \\
+\|\x\|_\infty &= \max_{1 \leq i \leq n} |x_i|
+\end{align*}
+Note that the 1- and 2-norms are special cases of the $p$-norm, and the $\infty$-norm is the limit of the $p$-norm as $p$ tends to infinity.
+We require $p \geq 1$ for the general definition of the $p$-norm because the triangle inequality fails to hold if $p < 1$.
+(Try to find a counterexample!)
+
+Here's a fun fact: for any given finite-dimensional vector space $V$, all norms on $V$ are equivalent in the sense that for two norms $\|\cdot\|_A, \|\cdot\|_B$, there exist constants $\alpha, \beta > 0$ such that
+\[\alpha\|\x\|_A \leq \|\x\|_B \leq \beta\|\x\|_A\]
+for all $\x \in V$. Therefore convergence in one norm implies convergence in any other norm.
+This rule may not apply in infinite-dimensional vector spaces such as function spaces, though.
+
+\subsection{Inner product spaces}
+An \term{inner product} on a real vector space $V$ is a function $\inner{\cdot}{\cdot} : V \times V \to \R$ satisfying
+\begin{enumerate}
+\item $\inner{\x}{\x} \geq 0$, with equality if and only if $\x = \vec{0}$
+\item $\inner{\alpha\x + \beta\y}{\vec{z}} = \alpha\inner{\x}{\vec{z}} + \beta\inner{\y}{\vec{z}}$
+\item $\inner{\x}{\y} = \inner{\y}{\x}$
+\end{enumerate}
+for all $\x, \y, \vec{z} \in V$ and all $\alpha,\beta \in \R$.
+A vector space endowed with an inner product is called an \term{inner product space}.
+
+Note that any inner product on $V$ induces a norm on $V$:
+\[\|\x\| = \sqrt{\inner{\x}{\x}}\]
+One can verify that the axioms for norms are satisfied under this definition and follow directly from the axioms for inner products.
+Therefore any inner product space is also a normed space (and hence also a metric space).\footnote{
+    If an inner product space is complete with respect to the distance metric induced by its inner product, we say that it is a \term{Hilbert space}.
+}
+
+Two vectors $\x$ and $\y$ are said to be \term{orthogonal} if $\inner{\x}{\y} = 0$.
+Orthogonality generalizes the notion of perpendicularity from Euclidean space.
+If two orthogonal vectors $\x$ and $\y$ additionally have unit length (i.e. $\|\x\| = \|\y\| = 1$), then they are described as \term{orthonormal}.
+
+The standard inner product on $\R^n$ is given by
+\[\inner{\x}{\y} = \sum_{i=1}^n x_iy_i = \x\tran\y\]
+The matrix notation on the righthand side (see the Transposition section if it's unfamiliar) arises because this inner product is a special case of matrix multiplication where we regard the resulting $1 \times 1$ matrix as a scalar.
+The inner product on $\R^n$ is also often written $\x\cdot\y$ (hence the alternate name \term{dot product}).
+The reader can verify that the two-norm $\|\cdot\|_2$ on $\R^n$ is induced by this inner product.
+
+\subsubsection{Pythagorean Theorem}
+The well-known Pythagorean theorem generalizes naturally to arbitrary inner product spaces.
+\begin{theorem}
+If $\inner{\x}{\y} = 0$, then
+\[\|\x+\y\|^2 = \|\x\|^2 + \|\y\|^2\]
+\end{theorem}
+\begin{proof}
+Suppose $\inner{\x}{\y} = 0$. Then
+\[\|\x+\y\|^2 = \inner{\x+\y}{\x+\y} = \inner{\x}{\x} + \inner{\y}{\x} + \inner{\x}{\y} + \inner{\y}{\y} = \|\x\|^2 + \|\y\|^2\]
+as claimed.
+\end{proof}
+
+\subsubsection{Cauchy-Schwarz inequality}
+This inequality is sometimes useful in proving bounds:
+\[|\inner{\x}{\y}| \leq \|\x\| \cdot \|\y\|\]
+for all $\x, \y \in V$. Equality holds exactly when $\x$ and $\y$ are scalar multiples of each other (or equivalently, when they are linearly dependent).
+
+\subsection{Transposition}
+If $\A \in \R^{m \times n}$, its \term{transpose} $\A\tran \in \R^{n \times m}$ is given by $(\A\tran)_{ij} = A_{ji}$ for each $(i, j)$.
+In other words, the columns of $\A$ become the rows of $\A\tran$, and the rows of $\A$ become the columns of $\A\tran$.
+
+The transpose has several nice algebraic properties that can be easily verified from the definition:
+\begin{enumerate}
+\item $(\A\tran)\tran = \A$
+\item $(\A+\mat{B})\tran = \A\tran + \mat{B}\tran$
+\item $(\alpha \A)\tran = \alpha \A\tran$
+\item $(\A\mat{B})\tran = \mat{B}\tran \A\tran$
+\end{enumerate}
+
+\subsection{Eigenthings}
+For a square matrix $\A \in \R^{n \times n}$, there may be vectors which, when $\A$ is applied to them, are simply scaled by some constant.
+We say that a nonzero vector $\x \in \R^n$ is an \term{eigenvector} of $\A$ corresponding to \term{eigenvalue} $\lambda$ if
+\[\A\x = \lambda\x\]
+The zero vector is excluded from this definition because $\A\vec{0} = \vec{0} = \lambda\vec{0}$ for every $\lambda$.
+
+We now give some useful results about how eigenvalues change after various manipulations.
+\begin{proposition}
+Let $\x$ be an eigenvector of $\A$ with corresponding eigenvalue $\lambda$.
+Then
+\begin{enumerate}[(i)]
+\item For any $\gamma \in \R$, $\x$ is an eigenvector of $\A + \gamma\I$ with eigenvalue $\lambda + \gamma$.
+\item If $\A$ is invertible, then $\x$ is an eigenvector of $\A\inv$ with eigenvalue $\lambda\inv$.
+\item $\A^k\x = \lambda^k\x$ for any $k \in \Z$ (where $\A^0 = \I$ by definition).
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+(i) follows readily:
+\[(\A + \gamma\I)\x = \A\x + \gamma\I\x = \lambda\x + \gamma\x = (\lambda + \gamma)\x\]
+
+(ii) Suppose $\A$ is invertible. Then
+\[\x = \A\inv\A\x = \A\inv(\lambda\x) = \lambda\A\inv\x\]
+Dividing by $\lambda$, which is valid because the invertibility of $\A$ implies $\lambda \neq 0$, gives $\lambda\inv\x = \A\inv\x$.
+
+(iii) The case $k \geq 0$ follows almost immediately by induction on $k$.
+Then the general case $k \in \Z$ follows by combining the $k \geq 0$ case with (ii).
+\end{proof}
+
+\subsection{Trace}
+The \term{trace} of a square matrix is the sum of its diagonal entries:
+\[\tr(\A) = \sum_{i=1}^n A_{ii}\]
+The trace has several nice algebraic properties:
+\begin{enumerate}
+\item $\tr(\A+\mat{B}) = \tr(\A) + \tr(\mat{B})$
+\item $\tr(\alpha \A) = \alpha\tr(\A)$
+\item $\tr(\A\tran) = \tr(\A)$
+\item $\tr(\A\mat{B}\mat{C}\mat{D}) = \tr(\mat{B}\mat{C}\mat{D}\A) = \tr(\mat{C}\mat{D}\A\mat{B}) = \tr(\mat{B}\A\mat{D}\mat{C})$
+\end{enumerate}
+The first three properties follow readily from the definition.
+The last is known as \term{invariance under cyclic permutations}. Note that the matrices cannot be reordered arbitrarily, for example $\tr(\A\mat{B}\mat{C}\mat{D}) \neq \tr(\mat{B}\A\mat{C}\mat{D})$ in general.
+
+Interestingly, the trace of a matrix is equal to the sum of its eigenvalues (repeated according to multiplicity):
+\[\tr(\A) = \sum_i \lambda_i\]
+
+\subsection{Determinant}
+The \term{determinant} of a square matrix can be defined in several different confusing ways, none of which are particularly important for our purposes; go look at an introductory linear algebra text (or Wikipedia) if you need a definition.
+But it's good to know the properties:
+\begin{enumerate}
+\item $\det(\I) = 1$
+\item $\det(\A\tran) = \det(\A)$
+\item $\det(\A\mat{B}) = \det(\A)\det(\mat{B})$
+\item $\det(\A\inv) = \det(\A)\inv$
+\item $\det(\alpha\A) = \alpha^n \det(\A)$
+\end{enumerate}
+Interestingly, the determinant of a matrix is equal to the product of its eigenvalues (repeated according to multiplicity):
+\[\det(\A) = \prod_i \lambda_i\]
+
+\subsection{Special kinds of matrices}
+There are several ways matrices can be classified.
+Each categorization implies some potentially desirable properties, so it's always good to know what kind of matrix you're dealing with.
+
+\subsubsection{Orthogonal matrices}
+A matrix $\mat{Q} \in \R^{n \times n}$ is said to be \term{orthogonal} if its columns are pairwise orthonormal.
+This definition implies that
+\[\mat{Q}\tran \mat{Q} = \mat{Q}\mat{Q}\tran = \I\]
+or equivalently, $\mat{Q}\tran = \mat{Q}\inv$. A nice thing about orthogonal matrices is that they preserve inner products:
+\[(\mat{Q}\x)\tran(\mat{Q}\y) = \x\tran \mat{Q}\tran \mat{Q}\y = \x\tran \I\y = \x\tran\y\]
+A direct result of this fact is that they also preserve 2-norms:
+\[\|\mat{Q}\x\|_2 = \sqrt{(\mat{Q}\x)\tran(\mat{Q}\x)} = \sqrt{\x\tran\x} = \|\x\|_2\]
+Therefore multiplication by an orthogonal matrix can be considered as a transformation that preserves length, but may rotate or reflect the vector about the origin.
+
+\subsubsection{Symmetric matrices}
+A matrix $\A \in \R^{n \times n}$ is said to be \term{symmetric} if it is equal to its own transpose ($\A = \A\tran$).
+This definition seems harmless enough but turns out to have some strong implications.
+We summarize the most important of these as
+\begin{theorem}
+(Spectral Theorem)
+Let $\A \in \R^{n \times n}$ be symmetric.
+Then there exists an orthonormal basis for $\R^n$ consisting of eigenvectors of $\A$.
+\end{theorem}
+This theorem allows us to factor symmetric matrices as follows:
+\[\A = \mat{Q}\mat{\Lambda}\mat{Q}\tran\]
+Here $\mat{Q}$ is an orthogonal matrix with the aforementioned orthogonal basis as its columns, and $\mat{\Lambda} = \diag(\lambda_1, \dots, \lambda_n)$, where $\lambda_1, \dots, \lambda_n \in \R$ are the corresponding eigenvalues\footnote{
+        The fact that the eigenvalues are real also follows from the symmetry of $\A$.
+} of $\A$.
+This is referred to as the \term{eigendecomposition} or \term{spectral decomposition} of $\A$.
+
+\subsubsection{Positive (semi-)definite matrices}
+A symmetric matrix $\A$ is \term{positive definite} if for all nonzero $\x \in \R^n$, $\x\tran\A\x > 0$.
+Sometimes people write $\A \succ 0$ to indicate that $\A$ is positive definite.
+Positive definite matrices have all positive eigenvalues and diagonal entries.
+
+A symmetric matrix $\A$ is \term{positive semi-definite} if for all $\x \in \R^n$, $\x\tran\A\x \geq 0$.
+Sometimes people write $\A \succeq 0$ to indicate that $\A$ is positive semi-definite.
+Positive semi-definite matrices have all nonnegative eigenvalues and diagonal entries.
+
+Positive definite and positive semi-definite matrices will come up very frequently!
+Note that since these matrices are also symmetric, the properties of symmetric matrices apply here as well.
+
+As an example of how these matrices arise, the matrix $\A\tran\A$ is positive semi-definite for any $\A \in \R^{m \times n}$, since
+\[\x\tran (\A\tran\A)\x = (\A\x)\tran(\A\x) = \|\A\x\|_2^2 \geq 0\]
+for any $\x \in \R^n$.
+
+\subsection{Singular value decomposition}
+Singular value decomposition (SVD) is a widely applicable tool in linear algebra.
+Its strength stems partially from the fact that \textit{every matrix} $\A \in \R^{m \times n}$ has an SVD (even non-square matrices)!
+The decomposition goes as follows:
+\[\A = \mat{U}\mat{\Sigma}\mat{V}\tran\]
+where $\mat{U} \in \R^{m \times m}$ and $\mat{V} \in \R^{n \times n}$ are orthogonal matrices and $\mat{\Sigma} \in \R^{m \times n}$ is a diagonal matrix with the \term{singular values} of $\A$ (denoted $\sigma_i$) on its diagonal.
+The singular values of $\A$ are defined as the square roots of the eigenvalues of $\A\tran\A$ (or equivalently, of $\A\A\tran$).
+
+By convention, the singular values are given in non-increasing order, i.e.
+\[\sigma_1 \geq \sigma_2 \geq \dots \geq \sigma_{\min(m,n)} \geq 0\]
+Only the first $r$ singular values are nonzero, where $r$ is the rank of $\A$.
+
+The columns of $\mat{U}$ are called the \term{left-singular vectors} of $\A$, and they are eigenvectors of $\A\A\tran$.
+(Try showing this!)
+The columns of $\mat{V}$ are called the \term{right-singular vectors} of $\A$, and they are eigenvectors of $\A\tran\A$.
+
+\subsection{Some useful matrix identities}
+To conclude this section we give some results that are not fundamental but are nonetheless nice tools to have.
+
+\subsubsection{Quadratic forms}
+Let $\A \in \R^{n \times n}$ be a symmetric matrix.
+The expression $\x\tran\A\x$ is called a \term{quadratic form} and comes up all the time.
+It is in some cases helpful to rewrite quadratic forms in terms of the individual elements that make up $\A$ and $\x$:
+\[\x\tran\A\x = \sum_{i=1}^n\sum_{j=1}^n A_{ij}x_ix_j\]
+This identity is not hard to show, but the derivation is somewhat tedious, so we omit it.
+The result can be used, for example, to derive $\nabla_\x(\x\tran\A\x)$, as well as to prove that all the diagonal entries of a positive-definite matrix are positive.
+
+\subsubsection{Sums of outer products}
+An \term{outer product} is an expression of the form $\a\b\tran$, where $\a \in \R^m$ and $\b \in \R^n$.
+By inspection it is not hard to see that such an expression yields an $m \times n$ matrix such that
+\[[\a\b\tran]_{ij} = a_ib_j\]
+It is not immediately obvious, but the sum of outer products is actually equivalent to an appropriate matrix-matrix product!
+We formalize this statement as
+\begin{proposition}
+Let $\a_1, \dots, \a_k \in \R^m$ and $\b_1, \dots, \b_k \in \R^n$. Then
+\[\sum_{\ell=1}^k \a_\ell\b_\ell\tran = \mat{A}\mat{B}\tran\]
+where
+\[\mat{A} = \matlit{\a_1 & \cdots & \a_k}, \tab \mat{B} = \matlit{\b_1 & \cdots & \b_k}\]
+\end{proposition}
+\begin{proof}
+For each $(i,j)$, we have
+\[\left[\sum_{\ell=1}^k \a_\ell\b_\ell\tran\right]_{ij} = \sum_{\ell=1}^k [\a_\ell\b_\ell\tran]_{ij} = \sum_{\ell=1}^k [\a_\ell]_i[\b_\ell]_j = \sum_{\ell=1}^k A_{i\ell}B_{j\ell}\]
+This last expression should be recognized as an inner product between the $i$th row of $\A$ and the $j$th row of $\mat{B}$, or equivalently the $j$th column of $\mat{B}\tran$.
+Hence by the definition of matrix multiplication, it is equal to $[\mat{A}\mat{B}\tran]_{ij}$.
+\end{proof}

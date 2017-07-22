@@ -1,0 +1,291 @@
+\term{Convexity} is a term that pertains to both sets and functions.
+There is a whole branch of mathematics called \term{convex analysis} devoted to studying convexity of sets and functions, but we will just focus on the bits relevant to optimization, particularly convexity as it pertains to functions.
+
+For functions, there are different degrees of convexity, and how convex a function is tells us a lot about its minima: do they exist, are they unique, how quickly can we find them using optimization algorithms, etc.
+In this section, we present basic results regarding convexity, strict convexity, and strong convexity.
+
+\subsubsection{Convex sets}
+\begin{figure}
+  \centering
+  \begin{subfigure}[b]{0.45\linewidth}
+    \includegraphics[width=\linewidth]{convex-set}
+    \caption{A convex set}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.45\linewidth}
+    \includegraphics[width=\linewidth]{nonconvex-set}
+    \caption{A non-convex set}
+  \end{subfigure}
+  \caption{What convex sets look like}
+  \label{fig:convexset}
+\end{figure}
+
+A set $\calC \subseteq \R^d$ is \term{convex} if
+\[t\x + (1-t)\y \in \calC\]
+for all $\vec{x}, \vec{y} \in \calC$ and all $t \in [0,1]$.
+
+Geometrically, this means that all the points on the line segment between any two points in $\calC$ are also in $\calC$.
+See Figure \ref{fig:convexset} for a visual.
+
+Why do we care whether or not a set is convex?
+We will see later that the nature of minima can depend greatly on whether or not the feasible set is convex.
+Undesirable pathological results can occur when we allow the feasible set to be arbitrary, so for proofs we will need to assume that it is convex.
+Fortunately, we often want to minimize over all of $\R^d$, which is easily seen to be a convex set.
+
+\subsubsection{Basics of convex functions}
+In the remainder of this section, assume $f : \R^d \to \R$ unless otherwise noted. We'll start with the definitions and then give some results.
+
+A function $f$ is \term{convex} if
+\[f(t\vec{x} + (1-t)\vec{y}) \leq t f(\vec{x}) + (1-t)f(\vec{y})\]
+for all $\vec{x}, \vec{y} \in \dom f$ and all $t \in [0,1]$.
+
+If the inequality holds strictly (i.e. $<$ rather than $\leq$) for all $t \in (0,1)$ and $\x \neq \y$, then we say that $f$ is \term{strictly convex}.
+
+A function $f$ is \term{strongly convex with parameter $m$} (or \term{$m$-strongly convex}) if the function
+\[\x \mapsto f(\x) - \frac{m}{2}\|\x\|_2^2\]
+is convex.
+
+These conditions are given in increasing order of strength; strong convexity implies strict convexity which implies convexity.
+
+%\begin{proposition}
+%If $f$ is strictly convex, then $f$ is convex.
+%\end{proposition}
+%\begin{proof}
+%Suppose $\x, \y \in \dom f$ and $t \in [0,1]$. We break it down by cases:
+%\begin{enumerate}
+%\item $\x \neq \y$ and $t \in (0,1)$: the convexity condition is a clear consequence of the strict convexity condition.
+%\item $\x = \y$ and $t \in [0,1]$: we have
+%\[f(t\x + (1-t)\y) = f(t\x + (1-t)\x) = f(\x) = f(\x) + t f(\x) - t f(\y) = t f(\x) + (1-t)f(\y)\]
+%so the condition holds.
+%\item $t = 0$: then
+%\[f(t\x + (1-t)\y) = f(\y) = t f(\x) + (1-t)f(\y)\]
+%\item $t = 1$: similar to the $t = 0$ case.
+%\end{enumerate}
+%Hence $f$ is convex.
+%\end{proof}
+%
+%\begin{proposition}
+%If $f$ is $m$-strongly convex, then $f$ is strictly convex.
+%\end{proposition}
+%\begin{proof}
+%To-do.
+%\end{proof}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{convex-function}
+  \caption{What convex functions look like}
+  \label{fig:convexfunction}
+\end{figure}
+
+Geometrically, convexity means that the line segment between two points on the graph of $f$ lies on or above the graph itself.
+See Figure \ref{fig:convexfunction} for a visual.
+
+Strict convexity means that the graph of $f$ lies strictly above the line segment, except at the segment endpoints.
+(So actually the function in the figure appears to be strictly convex.)
+
+\subsubsection{Consequences of convexity}
+Why do we care if a function is (strictly/strongly) convex?
+
+Basically, our various notions of convexity have implications about the nature of minima.
+It should not be surprising that the stronger conditions tell us more about the minima.
+
+\begin{proposition}
+Let $\calX$ be a convex set.
+If $f$ is convex, then any local minimum of $f$ in $\calX$ is also a global minimum.
+\end{proposition}
+\begin{proof}
+Suppose $f$ is convex, and let $\x^*$ be a local minimum of $f$ in $\calX$.
+Then for some neighborhood $\calN \subseteq \calX$ about $\x^*$,
+\[f(\x) \geq f(\x^*) \tab \forall \x \in \calN\]
+Suppose towards a contradiction that there exists $\xye \in \calX$ such that $f(\xye) < f(\x^*)$.
+Consider the line segment $\x(t) = t\x^* + (1-t)\xye, ~ t \in [0,1]$, noting that $\x(t) \in \calX$ by the convexity of $\calX$.
+Then by the convexity of $f$,
+\[f(\x(t)) \leq tf(\x^*) + (1-t)f(\xye) < tf(\x^*) + (1-t)f(\x^*) = f(\x^*)\]
+for all $t \in (0,1)$.
+
+We can pick $t$ to be sufficiently close to $1$ that $\x(t) \in \calN$; then $f(\x(t)) \geq f(\x^*)$ by the definition of $\calN$, but $f(\x(t)) < f(\x^*)$ by the above inequality, a contradiction.
+
+It follows that $f(\x^*) \leq f(\x)$ for all $\x \in \calX$, so $\x^*$ is a global minimum of $f$ in $\calX$.
+\end{proof}
+
+\begin{proposition}
+Let $\calX$ be a convex set.
+If $f$ is strictly convex, then there exists at most one local minimum of $f$ in $\calX$.
+Consequently, if it exists it is the unique global minimum of $f$ in $\calX$.
+\end{proposition}
+\begin{proof}
+The second sentence follows from the first, so all we must show is that if a local minimum exists in $\calX$ then it is unique.
+
+Suppose $\x^*$ is a local minimum of $f$ in $\calX$, and suppose towards a contradiction that there exists a local minimum $\xye \in \calX$ such that $\xye \neq \x^*$.
+
+Since $f$ is strictly convex, it is convex, so $\x^*$ and $\xye$ are both global minima of $f$ in $\calX$ by the previous result.
+Hence $f(\x^*) = f(\xye)$.
+Consider the line segment $\x(t) = t\x^* + (1-t)\xye, ~ t \in [0,1]$, which again must lie entirely in $\calX$.
+By the strict convexity of $f$,
+\[f(\x(t)) < tf(\x^*) + (1-t)f(\xye) = tf(\x^*) + (1-t)f(\x^*) = f(\x^*)\]
+for all $t \in (0,1)$.
+But this contradicts the fact that $\x^*$ is a global minimum.
+Therefore if $\xye$ is a local minimum of $f$ in $\calX$, then $\xye = \x^*$, so $\x^*$ is the unique minimum in $\calX$.
+\end{proof}
+
+It is worthwhile to examine how the feasible set affects the optimization problem.
+We will see why the assumption that $\calX$ is convex is needed in the results above.
+
+Consider the function $f(x) = x^2$, which is a strictly convex function.
+The unique global minimum of this function in $\R$ is $x = 0$.
+But let's see what happens when we change the feasible set $\calX$.
+\begin{enumerate}[(i)]
+\item $\calX = \{1\}$: This set is actually convex, so we still have a unique global minimum.
+But it is not the same as the unconstrained minimum!
+
+\item $\calX = \R \setminus \{0\}$: This set is non-convex, and we can see that $f$ has no minima in $\calX$.
+For any point $x \in \calX$, one can find another point $y \in \calX$ such that $f(y) < f(x)$.
+
+\item $\calX = (-\infty,-1] \cup [0,\infty)$: This set is non-convex, and we can see that there is a local minimum ($x = -1$) which is distinct from the global minimum ($x = 0$).
+
+\item $\calX = (-\infty,-1] \cup [1,\infty)$: This set is non-convex, and we can see that there are two global minima ($x = \pm 1$).
+\end{enumerate}
+
+\subsubsection{Showing that a function is convex}
+Hopefully the previous section has convinced the reader that convexity is an important property.
+Next we turn to the issue of showing that a function is (strictly/strongly) convex.
+It is of course possible (in principle) to directly show that the condition in the definition holds, but this is usually not the easiest way.
+
+\begin{proposition}
+Norms are convex.
+\end{proposition}
+\begin{proof}
+Let $\|\cdot\|$ be a norm on $\R^d$. Then for all $\x, \y \in \R^d$ and $t \in [0,1]$,
+\[\|t\x + (1-t)\y\| \leq \|t\x\| + \|(1-t)\y\| = |t|\|\x\| + |1-t|\|\y\| = t\|\x\| + (1-t)\|\y\|\]
+where we have used respectively the triangle inequality, the homogeneity of norms, and the fact that $t$ and $1-t$ are nonnegative.
+Hence $\|\cdot\|$ is convex.
+\end{proof}
+
+\begin{proposition}
+Suppose $f$ is differentiable. Then $f$ is convex if and only if
+\[f(\y) \geq f(\x) + \angle{\nabla f(\x), \y - \x}\]
+for all $\x, \y \in \dom f$.
+\end{proposition}
+\begin{proof}
+To-do.
+\end{proof}
+
+\begin{proposition}
+Suppose $f$ is twice differentiable.
+Then
+\begin{enumerate}[(i)]
+\item $f$ is convex if and only if $\nabla^2 f(\x) \succeq 0$ for all $\x \in \dom f$.
+\item If $\nabla^2 f(\x) \succ 0$ for all $\x \in \dom f$, then $f$ is strictly convex.
+\item $f$ is $m$-strongly convex if and only if $\nabla^2 f(\x) \succeq mI$ for all $\x \in \dom f$.
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+Omitted.
+\end{proof}
+
+\begin{proposition}
+If $f$ is convex and $\alpha \geq 0$, then $\alpha f$ is convex.
+\end{proposition}
+\begin{proof}
+Suppose $f$ is convex and $\alpha \geq 0$. Then for all $\x, \y \in \dom(\alpha f) = \dom f$,
+\begin{align*}
+(\alpha f)(t\x + (1-t)\y) &= \alpha f(t\x + (1-t)\y) \\
+&\leq \alpha\left(tf(\x) + (1-t)f(\y)\right) \\
+&= t(\alpha f(\x)) + (1-t)(\alpha f(\y)) \\
+&= t(\alpha f)(\x) + (1-t)(\alpha f)(\y)
+\end{align*}
+so $\alpha f$ is convex.
+\end{proof}
+
+\begin{proposition}
+If $f$ and $g$ are convex, then $f+g$ is convex.
+Furthermore, if $g$ is strictly convex, then $f+g$ is strictly convex, and if $g$ is $m$-strongly convex, then $f+g$ is $m$-strongly convex.
+\end{proposition}
+\begin{proof}
+Suppose $f$ and $g$ are convex. Then for all $\x, \y \in \dom (f+g) = \dom f \cap \dom g$,
+\begin{align*}
+(f+g)(t\x + (1-t)\y) &= f(t\x + (1-t)\y) + g(t\x + (1-t)\y) \\
+&\leq tf(\x) + (1-t)f(\y) + g(t\x + (1-t)\y) & \text{convexity of $f$} \\
+&\leq tf(\x) + (1-t)f(\y) + tg(\x) + (1-t)g(\y) & \text{convexity of $g$} \\
+&= t(f(\x) + g(\x)) + (1-t)(f(\y) + g(\y)) \\
+&= t(f+g)(\x) + (1-t)(f+g)(\y)
+\end{align*}
+so $f + g$ is convex.
+
+If $g$ is strictly convex, the second inequality above holds strictly for $\x \neq \y$ and $t \in (0,1)$, so $f+g$ is strictly convex.
+
+If $g$ is $m$-strongly convex, then the function $h(\x) \equiv g(\x) - \frac{m}{2}\|\x\|_2^2$ is convex, so $f+h$ is convex.
+But
+\[(f+h)(\x) \equiv f(\x) + h(\x) \equiv f(\x) + g(\x) - \frac{m}{2}\|\x\|_2^2 \equiv (f+g)(\x) - \frac{m}{2}\|\x\|_2^2\]
+so $f+g$ is $m$-strongly convex.
+\end{proof}
+
+\begin{proposition}
+If $f_1, \dots, f_n$ are convex and $\alpha_1, \dots, \alpha_n \geq 0$, then
+\[\sum_{i=1}^n \alpha_i f_i\]
+is convex.
+\end{proposition}
+\begin{proof}
+Follows from the previous two propositions by induction.
+\end{proof}
+
+\begin{proposition}
+If $f$ is convex, then $g(\vec{x}) \equiv f(A\x + \vec{b})$ is convex for any appropriately-sized $A$ and $\b$.
+\end{proposition}
+\begin{proof}
+Suppose $f$ is convex and $g$ is defined like so. Then for all $\x, \y \in \dom g$,
+\begin{align*}
+g(t\x + (1-t)\y) &= f(A(t\x + (1-t)\y) + \b) \\
+&= f(tA\x + (1-t)A\y + \b) \\
+&= f(tA\x + (1-t)A\y + t\b + (1-t)\b) \\
+&= f(t(A\x + \b) + (1-t)(A\y + \b)) \\
+&\leq tf(A\x + \b) + (1-t)f(A\y + \b) & \text{convexity of $f$} \\
+&= tg(\x) + (1-t)g(\y)
+\end{align*}
+Thus $g$ is convex.
+\end{proof}
+
+\begin{proposition}
+If $f$ and $g$ are convex, then $h(\vec{x}) \equiv \max\{f(\vec{x}), g(\vec{x})\}$ is convex.
+\end{proposition}
+\begin{proof}
+Suppose $f$ and $g$ are convex and $h$ is defined like so. Then for all $\x, \y \in \dom h$,
+\begin{align*}
+h(t\x + (1-t)\y) &= \max\{f(t\x + (1-t)\y), g(t\x + (1-t)\y)\} \\
+&\leq \max\{tf(\x) + (1-t)f(\y), tg(\x) + (1-t)g(\y)\} \\
+&\leq \max\{tf(\x), tg(\x)\} + \max\{(1-t)f(\y), (1-t)g(\y)\} \\
+&= t\max\{f(\x), g(\x)\} + (1-t)\max\{f(\y), g(\y)\} \\
+&= th(\x) + (1-t)h(\y)
+\end{align*}
+Note that in the first inequality we have used convexity of $f$ and $g$ plus the fact that $a \leq c, b \leq d$ implies $\max\{a,b\} \leq \max\{c,d\}$.
+In the second inequality we have used the fact that $\max\{a+b, c+d\} \leq \max\{a,c\} + \max\{b,d\}$.
+
+Thus $h$ is convex.
+\end{proof}
+
+\subsubsection{Examples}
+A good way to gain intuition about the distinction between convex, strictly convex, and strongly convex functions is to consider examples where the stronger property fails to hold.
+
+Functions that are convex but not strictly convex:
+\begin{enumerate}[(i)]
+\item $f(\x) = \w\tran\x + \alpha$ for any $\w \in \R^d, \alpha \in \R$.
+Such a function is called an \term{affine function}, and it is both convex and concave.
+(In fact, a function is affine if and only if it is both convex and concave.)
+Note that linear functions and constant functions are special cases of affine functions.
+\item $f(\x) = \|\x\|_1$
+\end{enumerate}
+
+Functions that are strictly but not strongly convex:
+\begin{enumerate}[(i)]
+\item $f(x) = x^4$.
+This example is interesting because it is strictly convex but you cannot show this fact via a second-order argument (since $f''(0) = 0$).
+\item $f(x) = \exp(x)$.
+This example is interesting because it's bounded below but has no local minimum.
+\item $f(x) = -\log x$.
+This example is interesting because it's strictly convex but not bounded below.
+\end{enumerate}
+
+Functions that are strongly convex:
+\begin{enumerate}[(i)]
+\item $f(\x) = \|\x\|_2^2$
+\end{enumerate}

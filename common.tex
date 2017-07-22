@@ -1,0 +1,91 @@
+% useful packages
+\usepackage{amsfonts,amsmath,amssymb,amsthm,bm,commath,enumerate,graphicx,hyperref,nicefrac,physics,subcaption}
+
+% formatting
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0em}
+\usepackage[margin=1.25in]{geometry}
+\hypersetup{
+    colorlinks=true,
+    linktoc=all,
+    linkcolor=black,
+    urlcolor=blue
+}
+
+% shorthand
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\dom}{dom}
+\DeclareMathOperator*{\range}{range}
+\DeclareMathOperator*{\diag}{diag}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calI}{\mathcal{I}}
+\newcommand{\calL}{\mathcal{L}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calN}{\mathcal{N}}
+\newcommand{\calP}{\mathcal{P}}
+\newcommand{\calR}{\mathcal{R}}
+\newcommand{\calX}{\mathcal{X}}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\matlit}[1]{\begin{bmatrix}#1\end{bmatrix}}
+\newcommand{\tran}{^\top}
+\newcommand{\inv}{^{-1}}
+\renewcommand{\angle}[1]{\langle #1 \rangle}
+\newcommand{\inner}[2]{\angle{#1, #2}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\pr}[1]{\P(#1)}
+\newcommand{\prbig}[1]{\P\big(#1\big)}
+\newcommand{\prbigg}[1]{\P\bigg(#1\bigg)}
+\newcommand{\prlr}[1]{\P\left(#1\right)}
+\newcommand{\given}{|}
+\renewcommand{\ev}[1]{\mathbb{E}[#1]}
+\newcommand{\evwrt}[2]{\mathbb{E}_{#1}[#2]}
+\renewcommand{\var}[1]{\operatorname{Var}(#1)}
+\newcommand{\cov}[2]{\operatorname{Cov}(#1, #2)}
+\newcommand{\bigev}[1]{\mathbb{E}\left[#1\right]}
+\newcommand{\bigvar}[1]{\operatorname{Var}\left(#1\right)}
+\newcommand{\bigcov}[2]{\operatorname{Cov}\left(#1, #2\right)}
+\newcommand{\iid}{\overset{\text{iid}}{\sim}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\term}[1]{\textbf{#1}}
+\newcommand{\tab}{\hspace{0.5cm}}
+\renewcommand{\a}{\vec{a}}
+\renewcommand{\b}{\vec{b}}
+\newcommand{\g}{\vec{g}}
+\newcommand{\h}{\vec{h}}
+\renewcommand{\o}{\vec{o}}
+\newcommand{\s}{\vec{s}}
+\newcommand{\x}{\vec{x}}
+\newcommand{\y}{\vec{y}}
+\newcommand{\w}{\vec{w}}
+\newcommand{\A}{\mat{A}}
+\newcommand{\I}{\mat{I}}
+\newcommand{\xye}{\tilde{\x}}
+\newcommand{\dotcup}{\mathbin{\dot{\cup}}}
+\newcommand{\bigdotcup}{\mathop{\dot{\bigcup}}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem*{theorem*}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem*{definition*}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem*{proposition*}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem*{lemma*}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem*{corollary*}{Corollary}
+\theoremstyle{remark}
+\newtheorem*{note}{Note}
+\newtheorem*{example}{Example}

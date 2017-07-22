@@ -1,0 +1,327 @@
+Probability theory provides powerful tools for modeling and dealing with uncertainty.
+It is used extensively in machine learning, particularly to construct and analyze classifiers.
+
+\subsection{Basics}
+Suppose we have some sort of randomized experiment (e.g. a coin toss, die roll) that has a fixed set of possible outcomes.
+This set is called the \term{sample space} and denoted $\Omega$.
+
+We would like to define probabilities for some \term{events}, which are subsets of $\Omega$.
+The set of events is denoted $\calF$.\footnote{
+    $\calF$ is required to be a $\sigma$-algebra for technical reasons; see \cite{rigorousprob}.
+}
+
+Then we can define a \term{probability measure} $\P : \calF \to [0,1]$ which must satisfy
+\begin{enumerate}[(i)]
+\item $\pr{\Omega} = 1$
+\item \term{Countable additivity}: for any countable collection of disjoint sets $\{A_i\} \subseteq \calF$,
+\[\prbigg{\bigcup_i A_i} = \sum_i \pr{A_i}\]
+\end{enumerate}
+The triple $(\Omega, \calF, \P)$ is called a \term{probability space}.\footnote{
+    Note that a probability space is simply a measure space in which the measure of the whole space equals 1.
+}
+
+If $\pr{A} = 1$, we say that $A$ occurs \term{almost surely} (often abbreviated a.s.).\footnote{
+    This is a probabilist's version of the measure-theoretic term \textit{almost everywhere}.
+}, and conversely $A$ occurs \term{almost never} if $\pr{A} = 0$.
+
+From these axioms, a number of useful rules can be derived.
+\begin{proposition}
+Let $A$ be an event. Then
+\begin{enumerate}[(i)]
+\item $\pr{A^c} = 1 - \pr{A}$.
+\item If $B$ is an event and $B \subseteq A$, then $\pr{B} \leq \pr{A}$.
+\item $0 = \pr{\varnothing} \leq \pr{A} \leq \pr{\Omega} = 1$
+\end{enumerate}
+\end{proposition}
+\begin{proof}
+(i) Using the countable additivity of $\P$, we have
+\[\pr{A} + \pr{A^c} = \pr{A \dotcup A^c} = \pr{\Omega} = 1\]
+
+To show (ii), suppose $B \in \calF$ and $B \subseteq A$. Then
+\[\pr{A} = \pr{B \dotcup (A \setminus B)} = \pr{B} + \pr{A \setminus B} \geq \pr{B}\]
+as claimed.
+
+For (iii): the middle inequality follows from (ii) since $\varnothing \subseteq A \subseteq \Omega$.
+We also have
+\[\pr{\varnothing} = \pr{\varnothing \dotcup \varnothing} = \pr{\varnothing} + \pr{\varnothing}\]
+by countable additivity, which shows $\pr{\varnothing} = 0$.
+\end{proof}
+
+\begin{proposition}
+If $A$ and $B$ are events, then $\pr{A \cup B} = \pr{A} + \pr{B} - \pr{A \cap B}$.
+\end{proposition}
+\begin{proof}
+The key is to break the events up into their various overlapping and non-overlapping parts.
+\begin{align*}
+\pr{A \cup B} &= \pr{(A \cap B) \dotcup (A \setminus B) \dotcup (B \setminus A)} \\
+&= \pr{A \cap B} + \pr{A \setminus B} + \pr{B \setminus A} \\
+&= \pr{A \cap B} + \pr{A} - \pr{A \cap B} + \pr{B} - \pr{A \cap B} \\
+&= \pr{A} + \pr{B} - \pr{A \cap B}
+\end{align*}
+\end{proof}
+
+\begin{proposition}
+If $\{A_i\} \subseteq \calF$ is a countable set of events, disjoint or not, then
+\[\prbigg{\bigcup_i A_i} \leq \sum_i \pr{A_i}\]
+\end{proposition}
+This inequality is sometimes referred to as \term{Boole's inequality} or the \term{union bound}.
+\begin{proof}
+Define $B_1 = A_1$ and $B_i = A_i \setminus (\bigcup_{j < i} A_j)$ for $i > 1$, noting that $\bigcup_{j \leq i} B_j = \bigcup_{j \leq i} A_j$ for all $i$ and the $B_i$ are disjoint.
+Then
+\[\prbigg{\bigcup_i A_i} = \prbigg{\bigcup_i B_i} = \sum_i \pr{B_i} \leq \sum_i \pr{A_i}\]
+where the last inequality follows by monotonicity since $B_i \subseteq A_i$ for all $i$.
+\end{proof}
+
+\subsubsection{Conditional probability}
+The \term{conditional probability} of event $A$ given that event $B$ has occurred is written $\pr{A \given B}$ and defined as
+\[\pr{A \given B} = \frac{\pr{A \cap B}}{\pr{B}}\]
+assuming $\pr{B} > 0$.\footnote{
+    In some cases it is possible to define conditional probability on events of probability zero, but this is significantly more technical so we omit it.
+}
+
+\subsubsection{Chain rule}
+Another very useful tool, the \term{chain rule}, follows immediately from this definition:
+\[\pr{A \cap B} = \pr{A \given B}\pr{B} = \pr{B \given A}\pr{A}\]
+
+\subsubsection{Bayes' rule}
+Taking the equality from above one step further, we arrive at the simple but crucial \term{Bayes' rule}:
+\[\pr{A \given B} = \frac{\pr{B \given A}\pr{A}}{\pr{B}}\]
+It is sometimes beneficial to omit the normalizing constant and write
+\[\pr{A \given B} \propto \pr{A}\pr{B \given A}\]
+Under this formulation, $\pr{A}$ is often referred to as the \term{prior}, $\pr{A \given B}$ as the \term{posterior}, and $\pr{B \given A}$ as the \term{likelihood}.
+
+In the context of machine learning, we can use Bayes' rule to update our ``beliefs'' (e.g. values of our model parameters) given some data that we've observed.
+
+\subsection{Random variables}
+A \term{random variable} is some uncertain quantity with an associated probability distribution over the values it can assume.
+
+Formally, a random variable on a probability space $(\Omega, \calF, \P)$ is a function\footnote{
+    The function must be measurable.
+} $X: \Omega \to \R$.\footnote{
+    More generally, the codomain can be any measurable space, but $\R$ is the most common case by far and sufficient for our purposes.
+}
+
+We denote the range of $X$ by $X(\Omega) = \{X(\omega) : \omega \in \Omega\}$.
+To give a concrete example (taken from \cite{pitman}), suppose $X$ is the number of heads in two tosses of a fair coin.
+The sample space is
+\[\Omega = \{hh, tt, ht, th\}\]
+and $X$ is determined completely by the outcome $\omega$, i.e. $X = X(\omega)$.
+For example, the event $X = 1$ is the set of outcomes $\{ht, th\}$.
+
+It is common to talk about the values of a random variable without directly referencing its sample space.
+The two are related by the following definition: the event that the value of $X$ lies in some set $S \subseteq \R$ is
+\[X \in S = \{\omega \in \Omega : X(\omega) \in S\}\]
+Note that special cases of this definition include $X$ being equal to, less than, or greater than some specified value.
+For example
+\[\pr{X = x} = \pr{\{\omega \in \Omega : X(\omega) = x\}}\]
+
+A word on notation: we write $p(X)$ to denote the entire probability distribution of $X$ and $p(x)$ for the evaluation of the function $p$ at a particular value $x \in X(\Omega)$.
+Hopefully this (reasonably standard) abuse of notation is not too distracting.
+If $p$ is parameterized by some parameters $\theta$, we write $p(X; \vec{\theta})$ or $p(x; \vec{\theta})$, unless we are in a Bayesian setting where the parameters are considered a random variable, in which case we condition on the parameters.
+
+\subsubsection{The cumulative distribution function}
+The \term{cumulative distribution function} (c.d.f.) gives the probability that a random variable is at most a certain value:
+\[F(x) = \pr{X \leq x}\]
+The c.d.f. can be used to give the probability that a variable lies within a certain range:
+\[\pr{a < X \leq b} = F(b) - F(a)\]
+
+\subsubsection{Discrete random variables}
+A \term{discrete random variable} is a random variable that has a countable range and assumes each value in this range with positive probability.
+Discrete random variables are completely specified by their \term{probability mass function} (p.m.f.) $p : X(\Omega) \to [0,1]$ which satisfies
+\[\sum_{x \in X(\Omega)} p(x) = 1\]
+For a discrete $X$, the probability of a particular value is given exactly by its p.m.f.:
+\[\pr{X = x} = p(x)\]
+
+\subsubsection{Continuous random variables}
+A \term{continuous random variable} is a random variable that has an uncountable range and assumes each value in this range with probability zero.
+Most of the continuous random variables that one would encounter in practice are \term{absolutely continuous random variables}\footnote{
+    Random variables that are continuous but not absolutely continuous are called \term{singular random variables}.
+    We will not discuss them, assuming rather that all continuous random variables admit a density function.
+}, which means that there exists a function $p : \R \to [0,\infty)$ that satisfies
+\[F(x) \equiv \int_{-\infty}^x p(z)\dd{z}\]
+The function $p$ is called a \term{probability density function} (abbreviated p.d.f.) and must satisfy
+\[\int_{-\infty}^\infty p(x)\dd{x} = 1\]
+The values of this function are not themselves probabilities, since they could exceed 1.
+However, they do have a couple of reasonable interpretations.
+One is as relative probabilities; even though the probability of each particular value being picked is technically zero, some points are still in a sense more likely than others.
+
+One can also think of the density as determining the probability that the variable will lie in a small range about a given value.
+Recall that for small $\epsilon$,
+\[\pr{x-\nicefrac{\epsilon}{2} \leq X \leq x+\nicefrac{\epsilon}{2}} = \int_{x-\nicefrac{\epsilon}{2}}^{x+\nicefrac{\epsilon}{2}} p(z)\dd{z} \approx \epsilon p(x)\]
+using a midpoint approximation to the integral.
+
+Here are some useful identities that follow from the definitions above:
+\begin{align*}
+\pr{a \leq X \leq b} &= \int_a^b p(x)\dd{x} \\
+p(x) &= F'(x)
+\end{align*}
+
+\subsubsection{Other kinds of random variables}
+There are random variables that are neither discrete nor continuous.
+For example, consider a random variable determined as follows:
+flip a fair coin, then the value is zero if it comes up heads, otherwise draw a number uniformly at random from $[1,2]$.
+Such a random variable can take on uncountably many values, but only finitely many of these with positive probability.
+We will not discuss such random variables because they are rather pathological and require measure theory to analyze.
+
+\subsection{Joint distributions}
+Often we have several random variables and we would like to get a distribution over some combination of them.
+A \term{joint distribution} is exactly this.
+For some random variables $X_1, \dots, X_n$, the joint distribution is written $p(X_1, \dots, X_n)$ and gives probabilities over entire assignments to all the $X_i$ simultaneously.
+
+\subsubsection{Independence of random variables}
+We say that two variables $X$ and $Y$ are \term{independent} if their joint distribution factors into their respective distributions, i.e.
+\[p(X, Y) = p(X)p(Y)\]
+We can also define independence for more than two random variables, although it is more complicated.
+Let $\{X_i\}_{i \in I}$ be a collection of random variables indexed by $I$, which may be infinite.
+Then $\{X_i\}$ are independent if for every finite subset of indices $i_1, \dots, i_k \in I$ we have
+\[p(X_{i_1}, \dots, X_{i_k}) = \prod_{j=1}^k p(X_{i_j})\]
+For example, in the case of three random variables, $X, Y, Z$, we require that $p(X,Y,Z) = p(X)p(Y)p(Z)$ as well as $p(X,Y) = p(X)p(Y)$, $p(X,Z) = p(X)p(Z)$, and $p(Y,Z) = p(Y)p(Z)$.
+
+It is often convenient (though perhaps questionable) to assume that a bunch of random variables are \term{independent and identically distributed} (i.i.d.) so that their joint distribution can be factored entirely:
+\[p(X_1, \dots, X_n) = \prod_{i=1}^n p(X_i)\]
+where $X_1, \dots, X_n$ all share the same p.m.f./p.d.f.
+
+\subsubsection{Marginal distributions}
+If we have a joint distribution over some set of random variables, it is possible to obtain a distribution for a subset of them by ``summing out'' (or ``integrating out'' in the continuous case) the variables we don't care about:
+\[p(X) = \sum_{y} p(X, y)\]
+
+\subsection{Great Expectations}
+If we have some random variable $X$, we might be interested in knowing what is the ``average'' value of $X$.
+This concept is captured by the \term{expected value} (or \term{mean}) $\ev{X}$, which is defined as
+\[\ev{X} = \sum_{x \in X(\Omega)} xp(x)\]
+for discrete $X$ and as
+\[\ev{X} = \int_{-\infty}^\infty xp(x)\dd{x}\]
+for continuous $X$.
+
+In words, we are taking a weighted sum of the values that $X$ can take on, where the weights are the probabilities of those respective values.
+The expected value has a physical interpretation as the ``center of mass'' of the distribution.
+
+\subsubsection{Properties of expected value}
+A very useful property of expectation is that of linearity:
+\[\bigev{\sum_{i=1}^n \alpha_i X_i + \beta} = \sum_{i=1}^n \alpha_i \ev{X_i} + \beta\]
+Note that this holds even if the $X_i$ are not independent!
+
+But if they are independent, the product rule also holds:
+\[\bigev{\prod_{i=1}^n X_i} = \prod_{i=1}^n \ev{X_i}\]
+
+\subsection{Variance}
+Expectation provides a measure of the ``center'' of a distribution, but frequently we are also interested in what the ``spread'' is about that center.
+We define the variance $\var{X}$ of a random variable $X$ by
+\[\var{X} = \bigev{\left(X - \ev{X}\right)^2}\]
+In words, this is the average squared deviation of the values of $X$ from the mean of $X$.
+Using a little algebra and the linearity of expectation, it is straightforward to show that
+\[\var{X} = \ev{X^2} - \ev{X}^2\]
+
+\subsubsection{Properties of variance}
+Variance is not linear (because of the squaring in the definition), but one can show the following:
+\[\var{\alpha X + \beta} = \alpha^2 \var{X}\]
+Basically, multiplicative constants become squared when they are pulled out, and additive constants disappear (since the variance contributed by a constant is zero).
+
+Furthermore, if $X_1, \dots, X_n$ are uncorrelated\footnote{
+    We haven't defined this yet; see the Correlation section below
+}, then
+\[\var{X_1 + \dots + X_n} = \var{X_1} + \dots + \var{X_n}\]
+
+\subsubsection{Standard deviation}
+Variance is a useful notion, but it suffers from that fact the units of variance are not the same as the units of the random variable (again because of the squaring).
+To overcome this problem we can use \term{standard deviation}, which is defined as $\sqrt{\var{X}}$.
+The standard deviation of $X$ has the same units as $X$.
+
+\subsection{Covariance}
+Covariance is a measure of the linear relationship between two random variables.
+We denote the covariance between $X$ and $Y$ as $\cov{X}{Y}$, and it is defined to be
+\[\cov{X}{Y} = \ev{(X-\ev{X})(Y-\ev{Y})}\]
+Note that the outer expectation must be taken over the joint distribution of $X$ and $Y$.
+
+Again, the linearity of expectation allows us to rewrite this as
+\[\cov{X}{Y} = \ev{XY} - \ev{X}\ev{Y}\]
+Comparing these formulas to the ones for variance, it is not hard to see that $\var{X} = \cov{X}{X}$.
+
+A useful property of covariance is that of \term{bilinearity}:
+\begin{align*}
+\cov{\alpha X + \beta Y}{Z} &= \alpha\cov{X}{Z} + \beta\cov{Y}{Z} \\
+\cov{X}{\alpha Y + \beta Z} &= \alpha\cov{X}{Y} + \beta\cov{X}{Z}
+\end{align*}
+
+\subsubsection{Correlation}
+Normalizing the covariance gives the \term{correlation}:
+\[\rho(X, Y) = \frac{\cov{X}{Y}}{\sqrt{\var{X}\var{Y}}}\]
+Correlation also measures the linear relationship between two variables, but unlike covariance always lies between $-1$ and $1$.
+
+Two variables are said to be \term{uncorrelated} if $\cov{X}{Y} = 0$ because $\cov{X}{Y} = 0$ implies that $\rho(X, Y) = 0$.
+If two variables are independent, then they are uncorrelated, but the converse does not hold in general.
+
+\subsection{Random vectors}
+So far we have been talking about \term{univariate distributions}, that is, distributions of single variables.
+But we can also talk about \term{multivariate distributions} which give distributions of \term{random vectors}:
+\[\bX = \matlit{X_1 \\ \vdots \\ X_n}\]
+The summarizing quantities we have discussed for single variables have natural generalizations to the multivariate case.
+
+Expectation of a random vector is simply the expectation applied to each component:
+\[\ev{\bX} = \matlit{\ev{X_1} \\ \vdots \\ \ev{X_n}}\]
+
+The variance is generalized by the \term{covariance matrix}:
+\[\mat{\Sigma} = \ev{(\bX - \ev{\bX})(\bX - \ev{\bX})\tran} = \matlit{
+\var{X_1} & \cov{X_1}{X_2} & \hdots & \cov{X_1}{X_n} \\
+\cov{X_2}{X_1} & \var{X_2} & \hdots & \cov{X_2}{X_n} \\
+\vdots & \vdots & \ddots & \vdots \\
+\cov{X_n}{X_1} & \cov{X_n}{X_2} & \hdots & \var{X_n}
+}\]
+That is, $\Sigma_{ij} = \cov{X_i}{X_j}$.
+Since covariance is symmetric in its arguments, the covariance matrix is also symmetric.
+It's also positive semi-definite: for any $\x$,
+\[\x\tran\mat{\Sigma}\x = \x\tran\ev{(\bX - \ev{\bX})(\bX - \ev{\bX})\tran}\x = \ev{\x\tran(\bX - \ev{\bX})(\bX - \ev{\bX})\tran\x} = \ev{((\bX - \ev{\bX})\tran\x)^2} \geq 0\]
+The inverse of the covariance matrix, $\mat{\Sigma}\inv$, is sometimes called the \term{precision matrix}.
+
+\subsection{Estimation of Parameters}
+Now we get into some basic topics from statistics.
+We make some assumptions about our problem by prescribing a \term{parametric} model (e.g. a distribution that describes how the data were generated), then we fit the parameters of the model to the data.
+How do we choose the values of the parameters?
+
+\subsubsection{Maximum likelihood estimation}
+A common way to fit parameters is \term{maximum likelihood estimation} (MLE).
+The basic principle of MLE is to choose values that ``explain'' the data best by maximizing the probability/density of the data we've seen as a function of the parameters.
+Suppose we have random variables $X_1, \dots, X_n$ and corresponding observations $x_1, \dots, x_n$.
+Then
+\[\hat{\vec{\theta}}_\textsc{mle} = \argmax_\vec{\theta} \calL(\vec{\theta})\]
+where $\calL$ is the \term{likelihood function}
+\[\calL(\vec{\theta}) = p(x_1, \dots, x_n; \vec{\theta})\]
+Often, we assume that $X_1, \dots, X_n$ are i.i.d. Then we can write
+\[p(x_1, \dots, x_n; \theta) = \prod_{i=1}^n p(x_i; \vec{\theta})\]
+At this point, it is usually convenient to take logs, giving rise to the \term{log-likelihood}
+\[\log\calL(\vec{\theta}) = \sum_{i=1}^n \log p(x_i; \vec{\theta})\]
+This is a valid operation because the probabilities/densities are assumed to be positive, and since log is a monotonically increasing function, it preserves ordering.
+In other words, any maximizer of $\log\calL$ will also maximize $\calL$.
+
+For some distributions, it is possible to analytically solve for the maximum likelihood estimator.
+If $\log\calL$ is differentiable, setting the derivatives to zero and trying to solve for $\vec{\theta}$ is a good place to start.
+
+\subsubsection{Maximum a posteriori estimation}
+A more Bayesian way to fit parameters is through \term{maximum a posteriori estimation} (MAP).
+In this technique we assume that the parameters are a random variable, and we specify a prior distribution $p(\vec{\theta})$.
+Then we can employ Bayes' rule to compute the posterior distribution of the parameters given the observed data:
+\[p(\vec{\theta} \given x_1, \dots, x_n) \propto p(\vec{\theta})p(x_1, \dots, x_n \given \vec{\theta})\]
+Computing the normalizing constant is often intractable, because it involves integrating over the parameter space, which may be very high-dimensional.
+Fortunately, if we just want the MAP estimate, we don't care about the normalizing constant!
+It does not affect which values of $\vec{\theta}$ maximize the posterior.
+So we have
+\[\hat{\vec{\theta}}_\textsc{map} = \argmax_\vec{\theta} p(\vec{\theta})p(x_1, \dots, x_n \given \vec{\theta})\]
+Again, if we assume the observations are i.i.d., then we can express this in the equivalent, and possibly friendlier, form
+\[\hat{\vec{\theta}}_\textsc{map} = \argmax_\vec{\theta} \left(\log p(\vec{\theta}) + \sum_{i=1}^n \log p(x_i \given \vec{\theta})\right)\]
+A particularly nice case is when the prior is chosen carefully such that the posterior comes from the same family as the prior.
+In this case the prior is called a \term{conjugate prior}.
+For example, if the likelihood is binomial and the prior is beta, the posterior is also beta.
+There are many conjugate priors; the reader may find this \href{https://en.wikipedia.org/wiki/Conjugate_prior#Table_of_conjugate_distributions}{table of conjugate priors} useful.
+
+\subsection{The Gaussian distribution}
+There are many distributions, but one of particular importance is the \term{Gaussian distribution}, also known as the \term{normal distribution}.
+It is a continuous distribution, parameterized by the mean $\mu$ and variance $\sigma^2$.
+In the single-variable case, the Gaussian distribution has the following density:
+\[p(x; \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)\]
+We write $X \sim \calN(\mu, \sigma^2)$ to denote that $X$ is normally distributed with mean $\mu$ and variance $\sigma^2$.
+As one might expect, this implies $\ev{X} = \mu$ and $\var{X} = \sigma^2$.
+
+In the multivariate case, the mean becomes a vector $\bm\mu$ and the variance is generalized by the covariance matrix $\mat{\Sigma}$.
+The density is
+\[p(\x; \bm\mu, \mat{\Sigma}) = \frac{1}{\sqrt{(2\pi)^d \det(\mat{\Sigma})}}\exp\left(-\frac{1}{2}(\x - \bm\mu)\tran\mat{\Sigma}\inv(\x - \bm\mu)\right)\]
+where $d$ is the dimension.

@@ -1,0 +1,111 @@
+Much of machine learning is about minimizing a \term{cost function} (also called an \term{objective function} in the optimization community), which is a scalar function of several variables that typically measures how poorly our model fits the data we have.
+
+\subsection{Extrema}
+Optimization is about finding \term{extrema}, which depending on the application could be minima or maxima.
+When defining extrema, it is also necessary to consider the set of inputs over which we're optimizing.
+This set $\calX \subseteq \R^d$ is called the \term{feasible set}.
+If $\calX$ is the entire domain of the function being optimized (as it often will be for our purposes), we say that the problem is \term{unconstrained}.
+Otherwise the problem is \term{constrained} and may be much harder to solve, depending on the nature of the feasible set.
+
+Suppose $f : \R^d \to \R$.
+A point $\x$ is said to be a \term{local minimum} (resp. \term{local maximum}) of $f$ in $\calX$ if $f(\x) \leq f(\y)$ (resp. $f(\x) \geq f(\y)$) for all $\y$ in some neighborhood $\calN \subseteq \calX$ that contains $\x$.
+Furthermore, if $f(\x) \leq f(\y)$ for all $\y \in \calX$, then $\x$ is a \term{global minimum} of $f$ in $\calX$ (similarly for global maximum).
+If the phrase ``in $\calX$'' is unclear from context, assume we are optimizing over the whole domain of the function.
+
+The qualifier \term{strict} (as in e.g. a strict local minimum) means that the inequality sign in the definition is actually a $>$ or $<$, with equality not allowed.
+This indicates that the extremum is unique.
+
+Observe that maximizing a function $f$ is equivalent to minimizing $-f$, so optimization problems are typically phrased in terms of minimization without loss of generality.
+This convention (which we follow here) eliminates the need to discuss minimization and maximization separately.
+
+\subsection{Gradients}
+The single most important concept from calculus in the context of machine learning is the \term{gradient}.
+Gradients generalize derivatives to scalar functions of several variables.
+The gradient of $f : \R^d \to \R$ at $\x \in \R^d$, denoted $\nabla f(\x)$, is given by
+\[\nabla f(\x) = \matlit{{\pdv{f}{x_1}}(\x) \\ \vdots \\ {\pdv{f}{x_n}}(\x)}\]
+Gradients have the following very important property: $\nabla f(\x)$ points in the direction of \term{steepest ascent} from $\x$:
+%\begin{center}
+%\includegraphics[width=0.9\linewidth]{gradient}
+%\end{center}
+Similarly, $-\nabla f(\x)$ points in the direction of \term{steepest descent} from $\x$.
+We will use this fact frequently when iteratively minimizing a function via \term{gradient descent}.
+
+\subsection{The Jacobian}
+The \term{Jacobian} of $f : \R^m \to \R^n$ is a matrix of first-order partial derivatives:
+\[\mat{J}_f(\x) = \matlit{
+	{\pdv{f_1}{x_1}}(\x) & \hdots & {\pdv{f_1}{x_n}}(\x) \\
+	\vdots & \ddots & \vdots \\
+	{\pdv{f_m}{x_1}}(\x) & \hdots & {\pdv{f_m}{x_n}}(\x)
+}\]
+i.e.
+\[[\mat{J}_f(\x)]_{ij} = {\pdv{f_i}{x_j}}(\x)\]
+
+\subsection{The Hessian}
+The \term{Hessian} matrix of $f : \R^d \to \R$ at $\x \in \R^d$ is a matrix of second-order partial derivatives:
+\[\nabla^2 f(\x) = \matlit{
+	{\pdv[2]{f}{x_1}}(\x) & \hdots & {\pdv{f}{x_1}{x_n}}(\x) \\
+	\vdots & \ddots & \vdots \\
+	{\pdv{f}{x_n}{x_1}}(\x) & \hdots & {\pdv[2]{f}{x_n}}(\x)
+}\]
+i.e.
+\[[\nabla^2 f(\x)]_{ij} = {\pdv{f}{x_i}{x_j}}(\x)\]
+Recall that if the partial derivatives are continuous, the order of differentiation can be interchanged (Clairaut's theorem), so the Hessian matrix will be symmetric.
+This will typically be the case for differentiable functions that we work with.
+
+The Hessian is used in some optimization algorithms such as Newton's method.
+It is expensive to calculate but can drastically reduce the number of iterations needed to converge to a local minimum by providing information about the curvature of $f$.
+
+\subsection{Taylor's theorem}
+Taylor's theorem has natural generalizations to functions of more than one variable.
+One version states
+\[f(\x + \y) = f(\x) + \nabla f(\x + \alpha\y)\tran\y\]
+for some $\alpha \in (0,1)$.
+Furthermore, if $f$ is twice-differentiable, we have
+\[f(\x + \y) = f(\x) + \nabla f(\x)\tran\y + \frac{1}{2}\y\tran\nabla^2f(\x+\alpha\y)\y\]
+for some $\alpha \in (0,1)$.
+
+This theorem is used in proofs about necessary and sufficient conditions for local optima.
+We don't reproduce the proofs here, but the interested reader can consult \cite{numopt}.
+
+Here is an example of such a useful fact: if $f$ is differentiable, then for any extremum $\x$, $\nabla f(\x) = \vec{0}$.
+Note that the converse does not hold in general, that is, $\nabla f(\x) = \vec{0}$ does not necessarily imply that $\x$ is an extremum.
+(It could be a \term{saddle point} of $f$.)
+
+\subsection{Matrix calculus}
+Since a lot of optimization reduces to finding points where the gradient vanishes, it is useful to have differentiation rules for matrix and vector expressions.
+We give some common rules here.
+Probably the two most important for our purposes are
+\begin{align*}
+\nabla_\x &(\vec{a}\tran\x) = \vec{a} \\
+\nabla_\x &(\x\tran\A\x) = (\A + \A\tran)\x
+\end{align*}
+Note that this second rule is defined only if $\A$ is square.
+Furthermore, if $\A$ is symmetric, we can simplify the result to $2\A\x$.
+
+\subsubsection{The chain rule}
+Most functions that we wish to optimize are not completely arbitrary functions, but rather are composed of simpler functions which we know how to handle.
+The chain rule gives us a way to calculate derivatives for a composite function in terms of the derivatives of the simpler functions that make it up.
+
+The chain rule from single-variable calculus should be familiar:
+\[(f \circ g)'(x) = f'(g(x))g'(x)\]
+where $\circ$ denotes function composition.
+We can generalize this to the multivariate case.
+\begin{proposition}
+Suppose $f : \R^m \to \R$ and $g : \R^n \to \R^m$. Then $f \circ g : \R^n \to \R$ and
+\[\nabla (f \circ g)(\x) = \mat{J}_g(\x)\tran \nabla f(g(\x))\]
+\end{proposition}
+\begin{proof}
+Observe that each $x_i$ potentially affects every output element of $g$, so we must sum the effects across all of these elements.
+The derivative of $f \circ g$ with respect to $x_i$ is given by
+\[{\pdv{(f \circ g)}{x_i}}(\x) = \sum_{j=1}^m {\pdv{(f \circ g)}{g_j}\pdv{g_j}{x_i}}(\x) = \nabla f(g(\x))\tran {\pdv{g}{x_i}}(\x)\]
+where
+\[{\pdv{g}{x_i}}(\x) = \matlit{
+{\pdv{g_1}{x_i}}(\x) \\
+\vdots \\
+{\pdv{g_m}{x_i}}(\x)
+}\]
+Stacking these partial derivatives and recalling the definitions of the Jacobian matrix and matrix multiplication, we obtain the desired result.
+\end{proof}
+
+\subsection{Convexity}
+\input{cs189-convexity.tex}
