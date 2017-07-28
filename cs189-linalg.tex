@@ -8,7 +8,7 @@ A vector space $V$ is a set (the elements of which are called \term{vectors}) on
     We take $\F = \R$ in this document to avoid an unnecessary diversion into abstract algebra.
 } called \term{scalars}.
 $V$ must satisfy
-\begin{enumerate}
+\begin{enumerate}[(i)]
 \item There exists an additive identity (written $\vec{0}$) in $V$ such that $\x+\vec{0} = \x$ for all $\x \in V$
 \item For each $\x \in V$, there exists an additive inverse (written $\vec{-x}$) such that $\x+(\vec{-x}) = \vec{0}$
 \item There exists a multiplicative identity (written $1$) in $\R$ such that $1\x = \x$ for all $\x \in V$
@@ -33,7 +33,7 @@ Tip: even when you're working in more general settings than $\R^n$, it is often 
 Metrics generalize the notion of distance from Euclidean space (although metric spaces need not be vector spaces).
 
 A \term{metric} on a set $S$ is a function $d : S \times S \to \R$ that satisfies
-\begin{enumerate}
+\begin{enumerate}[(i)]
 \item $d(x,y) \geq 0$, with equality if and only if $x = y$
 \item $d(x,y) = d(y,x)$
 \item $d(x,z) \leq d(x,y) + d(y,z)$ (the so-called \term{triangle inequality})
@@ -48,7 +48,7 @@ Note that the definition for limits of sequences of real numbers, which you have
 Norms generalize the notion of length from Euclidean space.
 
 A \term{norm} on a real vector space $V$ is a function $\|\cdot\| : V \to \R$ that satisfies
-\begin{enumerate}
+\begin{enumerate}[(i)]
 \item $\|\x\| \geq 0$, with equality if and only if $\x = \vec{0}$
 \item $\|\alpha\x\| = |\alpha|\|\x\|$
 \item $\|\x+\y\| \leq \|\x\| + \|\y\|$ (the \term{triangle inequality} again)
@@ -81,7 +81,7 @@ This rule may not apply in infinite-dimensional vector spaces such as function s
 
 \subsection{Inner product spaces}
 An \term{inner product} on a real vector space $V$ is a function $\inner{\cdot}{\cdot} : V \times V \to \R$ satisfying
-\begin{enumerate}
+\begin{enumerate}[(i)]
 \item $\inner{\x}{\x} \geq 0$, with equality if and only if $\x = \vec{0}$
 \item $\inner{\alpha\x + \beta\y}{\vec{z}} = \alpha\inner{\x}{\vec{z}} + \beta\inner{\y}{\vec{z}}$
 \item $\inner{\x}{\y} = \inner{\y}{\x}$
@@ -128,7 +128,7 @@ If $\A \in \R^{m \times n}$, its \term{transpose} $\A\tran \in \R^{n \times m}$ 
 In other words, the columns of $\A$ become the rows of $\A\tran$, and the rows of $\A$ become the columns of $\A\tran$.
 
 The transpose has several nice algebraic properties that can be easily verified from the definition:
-\begin{enumerate}
+\begin{enumerate}[(i)]
 \item $(\A\tran)\tran = \A$
 \item $(\A+\mat{B})\tran = \A\tran + \mat{B}\tran$
 \item $(\alpha \A)\tran = \alpha \A\tran$
@@ -167,7 +167,7 @@ Then the general case $k \in \Z$ follows by combining the $k \geq 0$ case with (
 The \term{trace} of a square matrix is the sum of its diagonal entries:
 \[\tr(\A) = \sum_{i=1}^n A_{ii}\]
 The trace has several nice algebraic properties:
-\begin{enumerate}
+\begin{enumerate}[(i)]
 \item $\tr(\A+\mat{B}) = \tr(\A) + \tr(\mat{B})$
 \item $\tr(\alpha \A) = \alpha\tr(\A)$
 \item $\tr(\A\tran) = \tr(\A)$
@@ -182,7 +182,7 @@ Interestingly, the trace of a matrix is equal to the sum of its eigenvalues (rep
 \subsection{Determinant}
 The \term{determinant} of a square matrix can be defined in several different confusing ways, none of which are particularly important for our purposes; go look at an introductory linear algebra text (or Wikipedia) if you need a definition.
 But it's good to know the properties:
-\begin{enumerate}
+\begin{enumerate}[(i)]
 \item $\det(\I) = 1$
 \item $\det(\A\tran) = \det(\A)$
 \item $\det(\A\mat{B}) = \det(\A)\det(\mat{B})$
@@ -255,7 +255,7 @@ The columns of $\mat{U}$ are called the \term{left-singular vectors} of $\A$, an
 The columns of $\mat{V}$ are called the \term{right-singular vectors} of $\A$, and they are eigenvectors of $\A\tran\A$.
 
 \subsection{Some useful matrix identities}
-To conclude this section we give some results that are not fundamental but are nonetheless nice tools to have.
+We now give some results that are not fundamental but are nonetheless nice tools to have.
 
 \subsubsection{Quadratic forms}
 Let $\A \in \R^{n \times n}$ be a symmetric matrix.
@@ -283,3 +283,49 @@ For each $(i,j)$, we have
 This last expression should be recognized as an inner product between the $i$th row of $\A$ and the $j$th row of $\mat{B}$, or equivalently the $j$th column of $\mat{B}\tran$.
 Hence by the definition of matrix multiplication, it is equal to $[\mat{A}\mat{B}\tran]_{ij}$.
 \end{proof}
+
+\subsection{Rayleigh quotients}
+There turns out to be an interesting connection between the quadratic form of a symmetric matrix and its eigenvalues.
+This connection is provided by the \term{Rayleigh quotient}
+\[R_\A(\x) = \frac{\x\tran\A\x}{\x\tran\x}\]
+The Rayleigh quotient has a couple of important properties which the reader can (and should!) easily verify from the definition:
+\begin{enumerate}[(i)]
+\item \term{Scale invariance}: for any vector $\x \neq \vec{0}$ and any scalar $\alpha \neq 0$, $R_\A(\x) = R_\A(\alpha\x)$.
+\item If $\x$ is an eigenvector of $\A$ with eigenvalue $\lambda$, then $R_\A(\x) = \lambda$.
+\end{enumerate}
+We can further show that the Rayleigh quotient is bounded by the largest and smallest eigenvalues of $\A$.
+But first we will show a useful special case of the final result.
+\begin{proposition}
+For any $\x$ such that $\|\x\|_2 = 1$,
+\[\lambda_{\min}(\A) \leq \x\tran\A\x \leq \lambda_{\max}(\A)\]
+with equality if and only if $\x$ is a corresponding eigenvector.
+\end{proposition}
+\begin{proof}
+We show only the $\max$ case because the argument for the $\min$ case is entirely analogous.
+
+Since $\A$ is symmetric, we can decompose it as $\A = \mat{Q}\mat{\Lambda}\mat{Q}\tran$.
+Then use the change of variable $\y = \mat{Q}\tran\x$, noting that the relationship between $\x$ and $\y$ is one-to-one and that $\|\y\|_2 = 1$ since $\mat{Q}$ is orthogonal.
+Hence
+\[\max_{\|\x\|_2 = 1} \x\tran\A\x = \max_{\|\y\|_2 = 1} \y\tran\mat{\Lambda}\y = \max_{y_1^2+\dots+y_n^2=1} \sum_{i=1}^n \lambda_i y_i^2\]
+Written this way, it is clear that $\y$ maximizes this expression exactly if and only if it satisfies $\sum_{i \in I} y_i^2 = 1$ where $I = \{i : \lambda_i = \max_{j=1,\dots,n} \lambda_j = \lambda_{\max}(\A)\}$ and $y_j = 0$ for $j \not\in I$.
+That is, $I$ contains the index or indices of the largest eigenvalue.
+In this case, the maximal value of the expression is
+\[\sum_{i=1}^n \lambda_i y_i^2 = \sum_{i \in I} \lambda_i y_i^2 = \lambda_{\max}(\A) \sum_{i \in I} y_i^2 = \lambda_{\max}(\A)\]
+and we see that $\x$ lies in the eigenspace of $\lambda_{\max}(\A)$:
+\[\x = \mat{Q}\mat{Q}\tran\x = \mat{Q}\y = \sum_{i=1}^n y_i\vec{q}_i = \sum_{i \in I} y_i\vec{q}_i\]
+where $\vec{q}_1, \dots, \vec{q}_n$ are the columns of $\mat{Q}$.
+Recall that these are eigenvectors of $\A$ and form an orthonormal basis for $\R^n$.
+By construction, the set $\{\vec{q}_i : i \in I\}$ forms an orthonormal basis for the eigenspace of $\lambda_{\max}(\A)$.
+Hence $\x$, which is a linear combination of these, lies in that eigenspace and thus is an eigenvector of $\A$ corresponding to $\lambda_{\max}(\A)$.
+
+Conversely, if $\x$ is a unit eigenvector of $\A$ with eigenvalue $\lambda_{\max}(\A)$, we have
+\[\x\tran\A\x = \x\tran\lambda_{\max}(\A)\x = \lambda_{\max}(\A)\|\x\|_2^2 = \lambda_{\max}(\A)\]
+We have shown that $\max_{\|\x\|_2 = 1} \x\tran\A\x = \lambda_{\max}(\A)$, from which we have the general inequality $\x\tran\A\x \leq \lambda_{\max}(\A)$ for all unit-length $\x$.
+\end{proof}
+By the scale invariance of the Rayleigh quotient, we immediately have as a corollary (since $\x\tran\A\x = R_{\A}(\x)$ for unit $\x$)
+\begin{theorem}
+(Min-max theorem)
+For all $\x \neq \vec{0}$,
+\[\lambda_{\min}(\A) \leq R_\A(\x) \leq \lambda_{\max}(\A)\]
+with equality if and only if $\x$ is a corresponding eigenvector.
+\end{theorem}

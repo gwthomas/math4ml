@@ -2,7 +2,7 @@ Much of machine learning is about minimizing a \term{cost function} (also called
 
 \subsection{Extrema}
 Optimization is about finding \term{extrema}, which depending on the application could be minima or maxima.
-When defining extrema, it is also necessary to consider the set of inputs over which we're optimizing.
+When defining extrema, it is necessary to consider the set of inputs over which we're optimizing.
 This set $\calX \subseteq \R^d$ is called the \term{feasible set}.
 If $\calX$ is the entire domain of the function being optimized (as it often will be for our purposes), we say that the problem is \term{unconstrained}.
 Otherwise the problem is \term{constrained} and may be much harder to solve, depending on the nature of the feasible set.
@@ -21,55 +21,37 @@ This convention (which we follow here) eliminates the need to discuss minimizati
 \subsection{Gradients}
 The single most important concept from calculus in the context of machine learning is the \term{gradient}.
 Gradients generalize derivatives to scalar functions of several variables.
-The gradient of $f : \R^d \to \R$ at $\x \in \R^d$, denoted $\nabla f(\x)$, is given by
-\[\nabla f(\x) = \matlit{{\pdv{f}{x_1}}(\x) \\ \vdots \\ {\pdv{f}{x_n}}(\x)}\]
-Gradients have the following very important property: $\nabla f(\x)$ points in the direction of \term{steepest ascent} from $\x$:
-%\begin{center}
-%\includegraphics[width=0.9\linewidth]{gradient}
-%\end{center}
+The gradient of $f : \R^d \to \R$, denoted $\nabla f$, is given by
+\[\nabla f = \matlit{\pdv{f}{x_1} \\ \vdots \\ \pdv{f}{x_n}}
+\tab\text{i.e.}\tab
+[\nabla f]_i = \pdv{f}{x_i}\]
+Gradients have the following very important property: $\nabla f(\x)$ points in the direction of \term{steepest ascent} from $\x$.
 Similarly, $-\nabla f(\x)$ points in the direction of \term{steepest descent} from $\x$.
 We will use this fact frequently when iteratively minimizing a function via \term{gradient descent}.
 
 \subsection{The Jacobian}
-The \term{Jacobian} of $f : \R^m \to \R^n$ is a matrix of first-order partial derivatives:
-\[\mat{J}_f(\x) = \matlit{
-	{\pdv{f_1}{x_1}}(\x) & \hdots & {\pdv{f_1}{x_n}}(\x) \\
+The \term{Jacobian} of $f : \R^n \to \R^m$ is a matrix of first-order partial derivatives:
+\[\mat{J}_f = \matlit{
+	\pdv{f_1}{x_1} & \hdots & \pdv{f_1}{x_n} \\
 	\vdots & \ddots & \vdots \\
-	{\pdv{f_m}{x_1}}(\x) & \hdots & {\pdv{f_m}{x_n}}(\x)
-}\]
-i.e.
-\[[\mat{J}_f(\x)]_{ij} = {\pdv{f_i}{x_j}}(\x)\]
+	\pdv{f_m}{x_1} & \hdots & \pdv{f_m}{x_n}}
+\tab\text{i.e.}\tab
+[\mat{J}_f]_{ij} = \pdv{f_i}{x_j}\]
+Note the special case $m = 1$, where $\nabla f = \mat{J}_f\tran$.
 
 \subsection{The Hessian}
-The \term{Hessian} matrix of $f : \R^d \to \R$ at $\x \in \R^d$ is a matrix of second-order partial derivatives:
-\[\nabla^2 f(\x) = \matlit{
-	{\pdv[2]{f}{x_1}}(\x) & \hdots & {\pdv{f}{x_1}{x_n}}(\x) \\
+The \term{Hessian} matrix of $f : \R^d \to \R$ is a matrix of second-order partial derivatives:
+\[\nabla^2 f = \matlit{
+	\pdv[2]{f}{x_1} & \hdots & \pdv{f}{x_1}{x_n} \\
 	\vdots & \ddots & \vdots \\
-	{\pdv{f}{x_n}{x_1}}(\x) & \hdots & {\pdv[2]{f}{x_n}}(\x)
-}\]
-i.e.
-\[[\nabla^2 f(\x)]_{ij} = {\pdv{f}{x_i}{x_j}}(\x)\]
+	\pdv{f}{x_n}{x_1} & \hdots & \pdv[2]{f}{x_n}}
+\tab\text{i.e.}\tab
+[\nabla^2 f]_{ij} = {\pdv{f}{x_i}{x_j}}\]
 Recall that if the partial derivatives are continuous, the order of differentiation can be interchanged (Clairaut's theorem), so the Hessian matrix will be symmetric.
 This will typically be the case for differentiable functions that we work with.
 
 The Hessian is used in some optimization algorithms such as Newton's method.
 It is expensive to calculate but can drastically reduce the number of iterations needed to converge to a local minimum by providing information about the curvature of $f$.
-
-\subsection{Taylor's theorem}
-Taylor's theorem has natural generalizations to functions of more than one variable.
-One version states
-\[f(\x + \y) = f(\x) + \nabla f(\x + \alpha\y)\tran\y\]
-for some $\alpha \in (0,1)$.
-Furthermore, if $f$ is twice-differentiable, we have
-\[f(\x + \y) = f(\x) + \nabla f(\x)\tran\y + \frac{1}{2}\y\tran\nabla^2f(\x+\alpha\y)\y\]
-for some $\alpha \in (0,1)$.
-
-This theorem is used in proofs about necessary and sufficient conditions for local optima.
-We don't reproduce the proofs here, but the interested reader can consult \cite{numopt}.
-
-Here is an example of such a useful fact: if $f$ is differentiable, then for any extremum $\x$, $\nabla f(\x) = \vec{0}$.
-Note that the converse does not hold in general, that is, $\nabla f(\x) = \vec{0}$ does not necessarily imply that $\x$ is an extremum.
-(It could be a \term{saddle point} of $f$.)
 
 \subsection{Matrix calculus}
 Since a lot of optimization reduces to finding points where the gradient vanishes, it is useful to have differentiation rules for matrix and vector expressions.
@@ -89,23 +71,105 @@ The chain rule gives us a way to calculate derivatives for a composite function 
 The chain rule from single-variable calculus should be familiar:
 \[(f \circ g)'(x) = f'(g(x))g'(x)\]
 where $\circ$ denotes function composition.
-We can generalize this to the multivariate case.
+There is a natural generalization of this rule to multivariate functions.
 \begin{proposition}
+Suppose $f : \R^m \to \R^k$ and $g : \R^n \to \R^m$. Then $f \circ g : \R^n \to \R^k$ and
+\[\mat{J}_{f \circ g}(\x) = \mat{J}_f(g(\x))\mat{J}_g(\x)\]
+\end{proposition}
+In the special case $k = 1$ we have the following corollary since $\nabla f = \mat{J}_f\tran$.
+\begin{corollary}
 Suppose $f : \R^m \to \R$ and $g : \R^n \to \R^m$. Then $f \circ g : \R^n \to \R$ and
 \[\nabla (f \circ g)(\x) = \mat{J}_g(\x)\tran \nabla f(g(\x))\]
+\end{corollary}
+
+\subsection{Taylor's theorem}
+Taylor's theorem has natural generalizations to functions of more than one variable.
+We give the version presented in \cite{numopt}.
+\begin{theorem}
+(Taylor's theorem)
+Suppose $f : \R^d \to \R$ is continuously differentiable, and let $\h \in \R^d$.
+Then there exists $t \in (0,1)$ such that
+\[f(\x + \h) = f(\x) + \nabla f(\x + t\h)\tran\h\]
+Furthermore, if $f$ is twice continuously differentiable, then
+\[\nabla f(\x + \h) = \nabla f(\x) + \int_0^1 \nabla^2 f(\x + t\h)\h \dif{t}\]
+and there exists $t \in (0,1)$ such that
+\[f(\x + \h) = f(\x) + \nabla f(\x)\tran\h + \frac{1}{2}\h\tran\nabla^2f(\x+t\h)\h\]
+\end{theorem}
+This theorem is used in proofs about conditions for local minima of unconstrained optimization problems.
+Some of the most important results are given in the next section.
+
+\subsection{Conditions for local minima}
+\begin{proposition}
+If $\x^*$ is a local minimum of $f$ and $f$ is continuously differentiable in a neighborhood of $\x^*$, then $\nabla f(\x^*) = \vec{0}$.
 \end{proposition}
 \begin{proof}
-Observe that each $x_i$ potentially affects every output element of $g$, so we must sum the effects across all of these elements.
-The derivative of $f \circ g$ with respect to $x_i$ is given by
-\[{\pdv{(f \circ g)}{x_i}}(\x) = \sum_{j=1}^m {\pdv{(f \circ g)}{g_j}\pdv{g_j}{x_i}}(\x) = \nabla f(g(\x))\tran {\pdv{g}{x_i}}(\x)\]
-where
-\[{\pdv{g}{x_i}}(\x) = \matlit{
-{\pdv{g_1}{x_i}}(\x) \\
-\vdots \\
-{\pdv{g_m}{x_i}}(\x)
-}\]
-Stacking these partial derivatives and recalling the definitions of the Jacobian matrix and matrix multiplication, we obtain the desired result.
+Let $\x^*$ be a local minimum of $f$, and suppose towards a contradiction that $\nabla f(\x^*) \neq \vec{0}$.
+Let $\h = -\nabla f(\x^*)$, noting that by the continuity of $\nabla f$ we have
+\[\lim_{t \to 0} -\nabla f(\x^* + t\h) = -\nabla f(\x^*) = \h\]
+Hence
+\[\lim_{t \to 0} \h\tran\nabla f(\x^* + t\h) = \h\tran\nabla f(\x^*) = -\|\h\|_2^2 < 0\]
+Thus there exists $T > 0$ such that $\h\tran\nabla f(\x^* + t\h) < 0$ for all $t \in [0,T]$.
+Now we apply Taylor's theorem: for any $t \in (0,T]$, there exists $t' \in (0,t)$ such that
+\[f(\x^* + t\h) = f(\x^*) + t\h\tran \nabla f(\x^* + t'\h) < f(\x^*)\]
+whence it follows that $\x^*$ is not a local minimum, a contradiction.
+Hence $\nabla f(\x^*) = \vec{0}$.
 \end{proof}
+The proof shows us why the vanishing gradient is necessary for an extremum: if $\nabla f(\x)$ is nonzero, there always exists a sufficiently small step $\alpha > 0$ such that $f(\x - \alpha\nabla f(\x))) < f(\x)$.
+For this reason, $-\nabla f(\x)$ is called a \term{descent direction}.
+
+Points where the gradient vanishes are called \term{stationary points}.
+Note that not all stationary points are extrema.
+Consider $f : \R^2 \to \R$ given by $f(x,y) = x^2 - y^2$.
+We have $\nabla f(\vec{0}) = \vec{0}$, but the point $\vec{0}$ is the minimum along the line $y = 0$ and the maximum along the line $x = 0$.
+Thus it is neither a local minimum nor a local maximum of $f$.
+Points such as these, where the gradient vanishes but there is no local extremum, are called \term{saddle points}.
+
+We have seen that first-order information (i.e. the gradient) is insufficient to characterize local minima.
+But we can say more with second-order information (i.e. the Hessian).
+First we prove a necessary second-order condition for local minima.
+\begin{proposition}
+If $\x^*$ is a local minimum of $f$ and $f$ is twice continuously differentiable in a neighborhood of $\x^*$, then $\nabla^2 f(\x^*)$ is positive semi-definite.
+\end{proposition}
+\begin{proof}
+Let $\x^*$ be a local minimum of $f$, and suppose towards a contradiction that $\nabla^2 f(\x^*)$ is not positive semi-definite.
+Let $\h$ be such that $\h\tran\nabla^2 f(\x^*)\h < 0$, noting that by the continuity of $\nabla^2 f$ we have
+\[\lim_{t \to 0} \nabla^2 f(\x^* + t\h) = \nabla^2 f(\x^*)\]
+Hence
+\[\lim_{t \to 0} \h\tran\nabla^2 f(\x^* + t\h)\h = \h\tran\nabla^2 f(\x^*)\h < 0\]
+Thus there exists $T > 0$ such that $\h\tran\nabla^2 f(\x^* + t\h)\h < 0$ for all $t \in [0,T]$.
+Now we apply Taylor's theorem: for any $t \in (0,T]$, there exists $t' \in (0,t)$ such that
+\[f(\x^* + t\h) = f(\x^*) + \underbrace{t\h\tran\nabla f(\x^*)}_0 + \frac{1}{2}t^2\h\tran\nabla^2 f(\x^* + t'\h)\h < f(\x^*)\]
+where the middle term vanishes because $\nabla f(\x^*) = \vec{0}$ by the previous result.
+It follows that $\x^*$ is not a local minimum, a contradiction.
+Hence $\nabla^2 f(\x^*)$ is positive semi-definite.
+\end{proof}
+Now we give sufficient conditions for local minima.
+\begin{proposition}
+Suppose $f$ is twice continuously differentiable with $\nabla^2 f$ positive semi-definite in a neighborhood of $\x^*$, and that $\nabla f(\x^*) = \vec{0}$.
+Then $\x^*$ is a local minimum of $f$.
+Furthermore if $\nabla^2 f(\x^*)$ is positive definite, then $\x^*$ is a strict local minimum.
+\end{proposition}
+\begin{proof}
+Let $\calB$ be an open ball of radius $r > 0$ centered at $\x^*$ which is contained in the neighborhood.
+Applying Taylor's theorem, we have that for any $\h$ with $\|\h\|_2 < r$, there exists $t \in (0,1)$ such that
+\[f(\x^* + \h) = f(\x^*) + \underbrace{\h\tran\nabla f(\x^*)}_0 + \frac{1}{2}\h\tran\nabla^2 f(\x^* + t\h)\h \geq f(\x^*)\]
+The last inequality holds because $\nabla^2 f(\x^* + t\h)$ is positive semi-definite (since $\|t\h\|_2 = t\|\h\|_2 < \|\h\|_2 < r$), so $\h\tran\nabla^2 f(\x^* + t\h)\h \geq 0$.
+Since $f(\x^*) \leq f(\x^* + \h)$ for all directions $\h$ with $\|\h\|_2 < r$, we conclude that $\x^*$ is a local minimum.
+
+Now further suppose that $\nabla^2 f(\x^*)$ is strictly positive definite.
+Since the Hessian is continuous we can choose another ball $\calB'$ with radius $r' > 0$ centered at $\x^*$ such that $\nabla^2 f(\x)$ is positive definite for all $\x \in \calB'$.
+Then following the same argument as above (except with a strict inequality now since the Hessian is positive definite) we have $f(\x^* + \h) > f(\x^*)$ for all $\h$ with $0 < \|\h\|_2 < r'$.
+Hence $\x^*$ is a strict local minimum.
+\end{proof}
+Note that, perhaps counterintuitively, the conditions $\nabla f(\x^*) = \vec{0}$ and $\nabla^2 f(\x^*)$ positive semi-definite are not enough to guarantee a local minimum at $\x^*$!
+Consider the function $f(x) = x^3$.
+We have $f'(0) = 0$ and $f''(0) = 0$ (so the Hessian, which in this case is the $1 \times 1$ matrix $\matlit{0}$, is positive semi-definite).
+But $f$ has a saddle point at $x = 0$.
+The function $f(x) = -x^4$ is an even worse offender -- it has the same gradient and Hessian at $x = 0$, but $x = 0$ is a strict local maximum for this function!
+
+For these reasons we require that the Hessian remains positive semi-definite as long as we are close to $\x^*$.
+Unfortunately, this condition is not practical to check computationally, but in some cases we can verify it analytically (usually by showing that $\nabla^2 f(\x)$ is p.s.d. for all $\x \in \R^d$).
+Also, if $\nabla^2 f(\x^*)$ is strictly positive definite, the continuity assumption on $f$ implies this condition, so we don't have to worry.
 
 \subsection{Convexity}
 \input{cs189-convexity.tex}

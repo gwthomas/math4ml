@@ -1,6 +1,4 @@
 \term{Convexity} is a term that pertains to both sets and functions.
-There is a whole branch of mathematics called \term{convex analysis} devoted to studying convexity of sets and functions, but we will just focus on the bits relevant to optimization, particularly convexity as it pertains to functions.
-
 For functions, there are different degrees of convexity, and how convex a function is tells us a lot about its minima: do they exist, are they unique, how quickly can we find them using optimization algorithms, etc.
 In this section, we present basic results regarding convexity, strict convexity, and strong convexity.
 
@@ -19,11 +17,11 @@ In this section, we present basic results regarding convexity, strict convexity,
   \label{fig:convexset}
 \end{figure}
 
-A set $\calC \subseteq \R^d$ is \term{convex} if
-\[t\x + (1-t)\y \in \calC\]
-for all $\vec{x}, \vec{y} \in \calC$ and all $t \in [0,1]$.
+A set $\calX \subseteq \R^d$ is \term{convex} if
+\[t\x + (1-t)\y \in \calX\]
+for all $\vec{x}, \vec{y} \in \calX$ and all $t \in [0,1]$.
 
-Geometrically, this means that all the points on the line segment between any two points in $\calC$ are also in $\calC$.
+Geometrically, this means that all the points on the line segment between any two points in $\calX$ are also in $\calX$.
 See Figure \ref{fig:convexset} for a visual.
 
 Why do we care whether or not a set is convex?
@@ -95,9 +93,9 @@ If $f$ is convex, then any local minimum of $f$ in $\calX$ is also a global mini
 \end{proposition}
 \begin{proof}
 Suppose $f$ is convex, and let $\x^*$ be a local minimum of $f$ in $\calX$.
-Then for some neighborhood $\calN \subseteq \calX$ about $\x^*$,
-\[f(\x) \geq f(\x^*) \tab \forall \x \in \calN\]
+Then for some neighborhood $\calN \subseteq \calX$ about $\x^*$, we have $f(\x) \geq f(\x^*)$ for all $\x \in \calN$.
 Suppose towards a contradiction that there exists $\xye \in \calX$ such that $f(\xye) < f(\x^*)$.
+
 Consider the line segment $\x(t) = t\x^* + (1-t)\xye, ~ t \in [0,1]$, noting that $\x(t) \in \calX$ by the convexity of $\calX$.
 Then by the convexity of $f$,
 \[f(\x(t)) \leq tf(\x^*) + (1-t)f(\xye) < tf(\x^*) + (1-t)f(\x^*) = f(\x^*)\]
