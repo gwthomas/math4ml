@@ -177,7 +177,7 @@ The first three properties follow readily from the definition.
 The last is known as \term{invariance under cyclic permutations}. Note that the matrices cannot be reordered arbitrarily, for example $\tr(\A\mat{B}\mat{C}\mat{D}) \neq \tr(\mat{B}\A\mat{C}\mat{D})$ in general.
 
 Interestingly, the trace of a matrix is equal to the sum of its eigenvalues (repeated according to multiplicity):
-\[\tr(\A) = \sum_i \lambda_i\]
+\[\tr(\A) = \sum_i \lambda_i(\A)\]
 
 \subsection{Determinant}
 The \term{determinant} of a square matrix can be defined in several different confusing ways, none of which are particularly important for our purposes; go look at an introductory linear algebra text (or Wikipedia) if you need a definition.
@@ -190,7 +190,7 @@ But it's good to know the properties:
 \item $\det(\alpha\A) = \alpha^n \det(\A)$
 \end{enumerate}
 Interestingly, the determinant of a matrix is equal to the product of its eigenvalues (repeated according to multiplicity):
-\[\det(\A) = \prod_i \lambda_i\]
+\[\det(\A) = \prod_i \lambda_i(\A)\]
 
 \subsection{Special kinds of matrices}
 There are several ways matrices can be classified.
@@ -255,17 +255,16 @@ The columns of $\mat{U}$ are called the \term{left-singular vectors} of $\A$, an
 The columns of $\mat{V}$ are called the \term{right-singular vectors} of $\A$, and they are eigenvectors of $\A\tran\A$.
 
 \subsection{Some useful matrix identities}
-We now give some results that are not fundamental but are nonetheless nice tools to have.
+\subsubsection{Matrix-vector product as linear combination of matrix columns}
+\begin{proposition}
+Let $\x \in \R^n$ be a vector and $\A \in \R^{m \times n}$ a matrix with columns $\a_1, \dots, \a_n$.
+Then
+\[\A\x = \sum_{i=1}^n x_i\a_i\]
+\end{proposition}
+This identity is extremely useful in understanding linear operators in terms of their matrices' columns.
+The proof is very simple (consider each element of $\A\x$ individually and expand by definitions) but it is a good exercise to convince yourself.
 
-\subsubsection{Quadratic forms}
-Let $\A \in \R^{n \times n}$ be a symmetric matrix.
-The expression $\x\tran\A\x$ is called a \term{quadratic form} and comes up all the time.
-It is in some cases helpful to rewrite quadratic forms in terms of the individual elements that make up $\A$ and $\x$:
-\[\x\tran\A\x = \sum_{i=1}^n\sum_{j=1}^n A_{ij}x_ix_j\]
-This identity is not hard to show, but the derivation is somewhat tedious, so we omit it.
-The result can be used, for example, to derive $\nabla_\x(\x\tran\A\x)$, as well as to prove that all the diagonal entries of a positive-definite matrix are positive.
-
-\subsubsection{Sums of outer products}
+\subsubsection{Sum of outer products as matrix-matrix product}
 An \term{outer product} is an expression of the form $\a\b\tran$, where $\a \in \R^m$ and $\b \in \R^n$.
 By inspection it is not hard to see that such an expression yields an $m \times n$ matrix such that
 \[[\a\b\tran]_{ij} = a_ib_j\]
@@ -284,7 +283,15 @@ This last expression should be recognized as an inner product between the $i$th 
 Hence by the definition of matrix multiplication, it is equal to $[\mat{A}\mat{B}\tran]_{ij}$.
 \end{proof}
 
-\subsection{Rayleigh quotients}
+\subsection{Quadratic forms}
+Let $\A \in \R^{n \times n}$ be a symmetric matrix.
+The expression $\x\tran\A\x$ is called a \term{quadratic form} and comes up all the time.
+It is in some cases helpful to rewrite quadratic forms in terms of the individual elements that make up $\A$ and $\x$:
+\[\x\tran\A\x = \sum_{i=1}^n\sum_{j=1}^n A_{ij}x_ix_j\]
+This identity is not hard to show, but the derivation is somewhat tedious, so we omit it.
+The result can be used, for example, to derive $\nabla_\x(\x\tran\A\x)$, as well as to prove that all the diagonal entries of a positive-definite matrix are positive.
+
+\subsubsection{Rayleigh quotients}
 There turns out to be an interesting connection between the quadratic form of a symmetric matrix and its eigenvalues.
 This connection is provided by the \term{Rayleigh quotient}
 \[R_\A(\x) = \frac{\x\tran\A\x}{\x\tran\x}\]
@@ -311,15 +318,14 @@ Written this way, it is clear that $\y$ maximizes this expression exactly if and
 That is, $I$ contains the index or indices of the largest eigenvalue.
 In this case, the maximal value of the expression is
 \[\sum_{i=1}^n \lambda_i y_i^2 = \sum_{i \in I} \lambda_i y_i^2 = \lambda_{\max}(\A) \sum_{i \in I} y_i^2 = \lambda_{\max}(\A)\]
-and we see that $\x$ lies in the eigenspace of $\lambda_{\max}(\A)$:
-\[\x = \mat{Q}\mat{Q}\tran\x = \mat{Q}\y = \sum_{i=1}^n y_i\vec{q}_i = \sum_{i \in I} y_i\vec{q}_i\]
-where $\vec{q}_1, \dots, \vec{q}_n$ are the columns of $\mat{Q}$.
-Recall that these are eigenvectors of $\A$ and form an orthonormal basis for $\R^n$.
-By construction, the set $\{\vec{q}_i : i \in I\}$ forms an orthonormal basis for the eigenspace of $\lambda_{\max}(\A)$.
+Then writing $\q_1, \dots, \q_n$ for the columns of $\mat{Q}$, we have
+\[\x = \mat{Q}\mat{Q}\tran\x = \mat{Q}\y = \sum_{i=1}^n y_i\q_i = \sum_{i \in I} y_i\q_i\]
+where we have used the matrix-vector product identity.
+
+Recall that $\q_1, \dots, \q_n$ are eigenvectors of $\A$ and form an orthonormal basis for $\R^n$.
+Therefore by construction, the set $\{\q_i : i \in I\}$ forms an orthonormal basis for the eigenspace of $\lambda_{\max}(\A)$.
 Hence $\x$, which is a linear combination of these, lies in that eigenspace and thus is an eigenvector of $\A$ corresponding to $\lambda_{\max}(\A)$.
 
-Conversely, if $\x$ is a unit eigenvector of $\A$ with eigenvalue $\lambda_{\max}(\A)$, we have
-\[\x\tran\A\x = \x\tran\lambda_{\max}(\A)\x = \lambda_{\max}(\A)\|\x\|_2^2 = \lambda_{\max}(\A)\]
 We have shown that $\max_{\|\x\|_2 = 1} \x\tran\A\x = \lambda_{\max}(\A)$, from which we have the general inequality $\x\tran\A\x \leq \lambda_{\max}(\A)$ for all unit-length $\x$.
 \end{proof}
 By the scale invariance of the Rayleigh quotient, we immediately have as a corollary (since $\x\tran\A\x = R_{\A}(\x)$ for unit $\x$)
@@ -329,3 +335,37 @@ For all $\x \neq \vec{0}$,
 \[\lambda_{\min}(\A) \leq R_\A(\x) \leq \lambda_{\max}(\A)\]
 with equality if and only if $\x$ is a corresponding eigenvector.
 \end{theorem}
+
+\subsubsection{The geometry of positive definite quadratic forms}
+A useful way to understand quadratic forms is by the geometry of their level sets.
+Recall that a \term{level set} or \term{isocontour} of a function is the set of all inputs such that the function applied to those inputs yields a given output.
+Mathematically, the $c$-isocontour of $f$ is $\{\x \in \dom f : f(\x) = c\}$.
+
+Let us consider the special case $f(\x) = \x\tran\mat{A}\x$ where $\mat{A}$ is a positive definite matrix.
+Since $\mat{A}$ is positive definite, it has a unique matrix square root $\A\halfpow = \mat{Q}\mat{\Lambda}\halfpow\mat{Q}\tran$, where $\mat{Q}\mat{\Lambda}\mat{Q}\tran = \A$ is the eigendecomposition of $\A$ and $\mat{\Lambda}\halfpow = \diag(\sqrt{\lambda_1}, \dots \sqrt{\lambda_d})$.
+It is easy to see that this matrix $\A\halfpow$ is positive definite and satisfies $\A\halfpow\A\halfpow = \A$.
+Fixing a value $c \geq 0$, the $c$-isocontour of $f$ is the set of $\x \in \R^d$ such that
+\[c = \x\tran\A\x = \x\tran\A\halfpow\A\halfpow\x = \|\A\halfpow\x\|_2^2\]
+where we have used the symmetry of $\A\halfpow$.
+Making the change of variable $\z = \A\halfpow\x$, we have the condition $\|\z\|_2 = \sqrt{c}$.
+That is, the values $\z$ lie on a sphere of radius $\sqrt{c}$.
+These can be parameterized as $\z = \sqrt{c}\hat{\z}$ where $\hat{\z}$ has $\|\hat{\z}\|_2 = 1$.
+Then since $\A\neghalfpow = \mat{Q}\mat{\Lambda}\neghalfpow\mat{Q}\tran$, we have
+\[\x = \A\neghalfpow\z = \mat{Q}\mat{\Lambda}\neghalfpow\mat{Q}\tran\sqrt{c}\hat{\z} = \mat{Q}(\sqrt{c}\mat{\Lambda}\neghalfpow)\tilde{\z}\]
+where $\tilde{\z} = \mat{Q}\tran\hat{\z}$ also satisfies $\|\tilde{\z}\|_2 = 1$ since $\mat{Q}$ is orthogonal.
+Using this parameterization, we see that the solution set $\{\x \in \R^d : f(\x) = c\}$ is the image of the unit sphere $\{\tilde{\z} \in \R^d : \|\tilde{\z}\|_2 = 1\}$ under the invertible linear map $\x = \mat{Q}(\sqrt{c}\mat{\Lambda}\neghalfpow)\tilde{\z}$.
+
+What we have gained with all these manipulations is a clear algebraic understanding of the $c$-isocontour of $f$ in terms of a sequence of linear transformations applied to a well-understood set.
+We begin with the unit sphere, then scale every axis $i$ by $\sqrt{c}\lambda_i\neghalfpow$, resulting in an axis-aligned ellipsoid.
+Observe that the axis lengths of the ellipsoid are proportional to the inverse square roots of the eigenvalues of $\A$.
+Hence larger eigenvalues correspond to shorter axis lengths, and vice-versa.
+
+Then this axis-aligned ellipsoid undergoes a rigid transformation (i.e. one that preserves length and angles, such as a rotation/reflection) given by $\mat{Q}$.
+The result of this transformation is that the axes of the ellipse are no longer along the coordinate axes in general, but rather along the directions given by the corresponding eigenvectors.
+To see this, consider the unit vector $\vec{e}_i \in \R^d$ that has $[\vec{e}_i]_j = \delta_{ij}$.
+In the pre-transformed space, this vector points along the axis with length proportional to $\lambda_i\neghalfpow$.
+But after applying the rigid transformation $\mat{Q}$, the resulting vector points in the direction of the corresponding eigenvector $\q_i$, since
+\[\mat{Q}\vec{e}_i = \sum_{j=1}^d [e_i]_j\q_j = \q_i\]
+where we have used the matrix-vector product identity from earlier.
+
+In summary: the isocontours of $f(\x) = \x\tran\A\x$ are ellipsoids such that the axes point in the directions of the eigenvectors of $\A$, and the radii of these axes are proportional to the inverse square roots of the corresponding eigenvalues.

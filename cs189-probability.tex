@@ -28,14 +28,14 @@ From these axioms, a number of useful rules can be derived.
 \begin{proposition}
 Let $A$ be an event. Then
 \begin{enumerate}[(i)]
-\item $\pr{A^c} = 1 - \pr{A}$.
+\item $\pr{A\comp} = 1 - \pr{A}$.
 \item If $B$ is an event and $B \subseteq A$, then $\pr{B} \leq \pr{A}$.
 \item $0 = \pr{\varnothing} \leq \pr{A} \leq \pr{\Omega} = 1$
 \end{enumerate}
 \end{proposition}
 \begin{proof}
 (i) Using the countable additivity of $\P$, we have
-\[\pr{A} + \pr{A^c} = \pr{A \dotcup A^c} = \pr{\Omega} = 1\]
+\[\pr{A} + \pr{A\comp} = \pr{A \dotcup A\comp} = \pr{\Omega} = 1\]
 
 To show (ii), suppose $B \in \calF$ and $B \subseteq A$. Then
 \[\pr{A} = \pr{B \dotcup (A \setminus B)} = \pr{B} + \pr{A \setminus B} \geq \pr{B}\]
@@ -315,13 +315,27 @@ There are many conjugate priors; the reader may find this \href{https://en.wikip
 
 \subsection{The Gaussian distribution}
 There are many distributions, but one of particular importance is the \term{Gaussian distribution}, also known as the \term{normal distribution}.
-It is a continuous distribution, parameterized by the mean $\mu$ and variance $\sigma^2$.
-In the single-variable case, the Gaussian distribution has the following density:
-\[p(x; \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)\]
-We write $X \sim \calN(\mu, \sigma^2)$ to denote that $X$ is normally distributed with mean $\mu$ and variance $\sigma^2$.
-As one might expect, this implies $\ev{X} = \mu$ and $\var{X} = \sigma^2$.
-
-In the multivariate case, the mean becomes a vector $\bm\mu$ and the variance is generalized by the covariance matrix $\mat{\Sigma}$.
-The density is
+It is a continuous distribution, parameterized by its mean $\bm\mu \in \R^d$ and positive-definite covariance matrix $\mat{\Sigma} \in \R^{d \times d}$, with density
 \[p(\x; \bm\mu, \mat{\Sigma}) = \frac{1}{\sqrt{(2\pi)^d \det(\mat{\Sigma})}}\exp\left(-\frac{1}{2}(\x - \bm\mu)\tran\mat{\Sigma}\inv(\x - \bm\mu)\right)\]
-where $d$ is the dimension.
+Note that in the special case $d = 1$, the density is written in the more recognizable form
+\[p(x; \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)\]
+We write $\vec{X} \sim \calN(\bm\mu, \mat{\Sigma})$ to denote that $\vec{X}$ is normally distributed with mean $\bm\mu$ and variance $\mat{\Sigma}$.
+
+\subsubsection{The geometry of multivariate Gaussians}
+The geometry of the multivariate Gaussian density is intimately related to the geometry of positive definite quadratic forms, so make sure the material in that section is well-understood before tackling this section.
+
+First observe that the p.d.f. of the multivariate Gaussian can be rewritten as
+\[p(\x; \bm\mu, \mat{\Sigma}) = g(\xye\tran\mat{\Sigma}\inv\xye)\]
+where $\xye = \x - \bm\mu$ and $g(z) = [(2\pi)^d \det(\mat{\Sigma})]^{-\frac{1}{2}}\exp\left(-\frac{z}{2}\right)$.
+Writing the density in this way, we see that after shifting by the mean $\bm\mu$, the density is really just a simple function of its precision matrix's quadratic form.
+
+Here is a key observation: this function $g$ is \term{strictly monotonically decreasing} in its argument.
+That is, $g(a) > g(b)$ whenever $a < b$.
+Therefore, small values of $\xye\tran\mat{\Sigma}\inv\xye$ (which generally correspond to points where $\xye$ is closer to $\vec{0}$, i.e. $\x \approx \bm\mu$) have relatively high probability densities, and vice-versa.
+Furthermore, because $g$ is \textit{strictly} monotonic, it is injective, so the $c$-isocontours of $p(\x; \bm\mu, \mat{\Sigma})$ are the $g\inv(c)$-isocontours of the function $\x \mapsto \xye\tran\mat{\Sigma}\inv\xye$.
+That is, for any $c$,
+\[\{\x \in \R^d : p(\x; \bm\mu, \mat{\Sigma}) = c\} = \{\x \in \R^d : \xye\tran\mat{\Sigma}\inv\xye = g\inv(c)\}\]
+In words, these functions have the same isocontours but different isovalues.
+
+Recall the executive summary of the geometry of positive definite quadratic forms: the isocontours of $f(\x) = \x\tran\A\x$ are ellipsoids such that the axes point in the directions of the eigenvectors of $\A$, and the lengths of these axes are proportional to the inverse square roots of the corresponding eigenvalues.
+Therefore in this case, the isocontours of the density are ellipsoids (centered at $\bm\mu$) with axis lengths proportional to the inverse square roots of the eigenvalues of $\mat{\Sigma}\inv$, or equivalently, the square roots of the eigenvalues of $\mat{\Sigma}$.

@@ -40,15 +40,16 @@ Notation & Meaning \\
 $\R$ & set of real numbers \\
 $\R^n$ & set (vector space) of $n$-tuples of real numbers, endowed with the usual inner product \\
 $\R^{m \times n}$ & set (vector space) of $m$-by-$n$ matrices \\
+$\delta_{ij}$ & Kronecker delta, i.e. $\delta_{ij} = 1$ if $i = j$, $0$ otherwise \\
 $\nabla f(\vec{x})$ & gradient of the function $f$ evaluated at $\x$ \\
 $\nabla^2 f(\vec{x})$ & Hessian of the function $f$ evaluated at $\x$ \\
 $\A\tran$ & transpose of the matrix $\A$ \\
 $\Omega$ & sample space \\
 $\pr{A}$ & probability of event $A$ \\
-$\pr{A \mid B}$ & probability of event $A$, given $B$ \\
 $p(X)$ & distribution of random variable $X$ \\
 $p(x)$ & probability density/mass function evaluated at $x$ \\
-$A^c$ & complement of event $A$ \\
+$A\comp$ & complement of event $A$ \\
+$A \dotcup B$ & union of $A$ and $B$, with the extra requirement that $A \cap B = \varnothing$ \\
 $\ev{X}$ & expected value of random variable $X$ \\
 $\var{X}$ & variance of random variable $X$ \\
 $\cov{X}{Y}$ & covariance of random variables $X$ and $Y$ \\
@@ -58,7 +59,7 @@ $\cov{X}{Y}$ & covariance of random variables $X$ and $Y$ \\
 \vspace{0.5cm}
 Other notes:
 \begin{itemize}
-\item Vectors are in bold (e.g. $\vec{x}$).
+\item Vectors and matrices are in bold (e.g. $\x, \A$).
 This is true for vectors in $\R^n$ as well as for vectors in general vector spaces.
 We generally use Greek letters for scalars and capital Roman letters for matrices and random variables.
 
