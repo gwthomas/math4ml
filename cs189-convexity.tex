@@ -93,7 +93,7 @@ If $f$ is convex, then any local minimum of $f$ in $\calX$ is also a global mini
 \end{proposition}
 \begin{proof}
 Suppose $f$ is convex, and let $\x^*$ be a local minimum of $f$ in $\calX$.
-Then for some neighborhood $\calN \subseteq \calX$ about $\x^*$, we have $f(\x) \geq f(\x^*)$ for all $\x \in \calN$.
+Then for some neighborhood $N \subseteq \calX$ about $\x^*$, we have $f(\x) \geq f(\x^*)$ for all $\x \in N$.
 Suppose towards a contradiction that there exists $\xye \in \calX$ such that $f(\xye) < f(\x^*)$.
 
 Consider the line segment $\x(t) = t\x^* + (1-t)\xye, ~ t \in [0,1]$, noting that $\x(t) \in \calX$ by the convexity of $\calX$.
@@ -101,7 +101,7 @@ Then by the convexity of $f$,
 \[f(\x(t)) \leq tf(\x^*) + (1-t)f(\xye) < tf(\x^*) + (1-t)f(\x^*) = f(\x^*)\]
 for all $t \in (0,1)$.
 
-We can pick $t$ to be sufficiently close to $1$ that $\x(t) \in \calN$; then $f(\x(t)) \geq f(\x^*)$ by the definition of $\calN$, but $f(\x(t)) < f(\x^*)$ by the above inequality, a contradiction.
+We can pick $t$ to be sufficiently close to $1$ that $\x(t) \in N$; then $f(\x(t)) \geq f(\x^*)$ by the definition of $N$, but $f(\x(t)) < f(\x^*)$ by the above inequality, a contradiction.
 
 It follows that $f(\x^*) \leq f(\x)$ for all $\x \in \calX$, so $\x^*$ is a global minimum of $f$ in $\calX$.
 \end{proof}
@@ -153,7 +153,7 @@ It is of course possible (in principle) to directly show that the condition in t
 Norms are convex.
 \end{proposition}
 \begin{proof}
-Let $\|\cdot\|$ be a norm on $\R^d$. Then for all $\x, \y \in \R^d$ and $t \in [0,1]$,
+Let $\|\cdot\|$ be a norm on a vector space $V$. Then for all $\x, \y \in V$ and $t \in [0,1]$,
 \[\|t\x + (1-t)\y\| \leq \|t\x\| + \|(1-t)\y\| = |t|\|\x\| + |1-t|\|\y\| = t\|\x\| + (1-t)\|\y\|\]
 where we have used respectively the triangle inequality, the homogeneity of norms, and the fact that $t$ and $1-t$ are nonnegative.
 Hence $\|\cdot\|$ is convex.
@@ -228,16 +228,16 @@ Follows from the previous two propositions by induction.
 \end{proof}
 
 \begin{proposition}
-If $f$ is convex, then $g(\vec{x}) \equiv f(A\x + \vec{b})$ is convex for any appropriately-sized $A$ and $\b$.
+If $f$ is convex, then $g(\vec{x}) \equiv f(\A\x + \vec{b})$ is convex for any appropriately-sized $\A$ and $\b$.
 \end{proposition}
 \begin{proof}
 Suppose $f$ is convex and $g$ is defined like so. Then for all $\x, \y \in \dom g$,
 \begin{align*}
-g(t\x + (1-t)\y) &= f(A(t\x + (1-t)\y) + \b) \\
-&= f(tA\x + (1-t)A\y + \b) \\
-&= f(tA\x + (1-t)A\y + t\b + (1-t)\b) \\
-&= f(t(A\x + \b) + (1-t)(A\y + \b)) \\
-&\leq tf(A\x + \b) + (1-t)f(A\y + \b) & \text{convexity of $f$} \\
+g(t\x + (1-t)\y) &= f(\A(t\x + (1-t)\y) + \b) \\
+&= f(t\A\x + (1-t)\A\y + \b) \\
+&= f(t\A\x + (1-t)\A\y + t\b + (1-t)\b) \\
+&= f(t(\A\x + \b) + (1-t)(\A\y + \b)) \\
+&\leq tf(\A\x + \b) + (1-t)f(\A\y + \b) & \text{convexity of $f$} \\
 &= tg(\x) + (1-t)g(\y)
 \end{align*}
 Thus $g$ is convex.

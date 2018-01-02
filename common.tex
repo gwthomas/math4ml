@@ -18,6 +18,7 @@
 \DeclareMathOperator*{\dom}{dom}
 \DeclareMathOperator*{\range}{range}
 \DeclareMathOperator*{\diag}{diag}
+\DeclareMathOperator*{\Null}{null}
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\F}{\mathbb{F}}
 \newcommand{\N}{\mathbb{N}}
@@ -40,12 +41,14 @@
 \renewcommand{\vec}[1]{\mathbf{#1}}
 \newcommand{\mat}[1]{\mathbf{#1}}
 \newcommand{\matlit}[1]{\begin{bmatrix}#1\end{bmatrix}}
-\newcommand{\tran}{^\top}
+\newcommand{\tran}{^{\!\top\!}}
 \newcommand{\inv}{^{-1}}
 \newcommand{\halfpow}{^{\frac{1}{2}}}
 \newcommand{\neghalfpow}{^{-\frac{1}{2}}}
 \renewcommand{\angle}[1]{\langle #1 \rangle}
+\newcommand{\bigangle}[1]{\left\langle #1 \right\rangle}
 \newcommand{\inner}[2]{\angle{#1, #2}}
+\newcommand{\biginner}[2]{\bigangle{#1, #2}}
 \renewcommand{\P}{\mathbb{P}}
 \newcommand{\pr}[1]{\P(#1)}
 \newcommand{\prbig}[1]{\P\big(#1\big)}
@@ -66,6 +69,7 @@
 \newcommand{\tab}{\hspace{0.5cm}}
 \renewcommand{\a}{\vec{a}}
 \renewcommand{\b}{\vec{b}}
+\newcommand{\e}{\vec{e}}
 \newcommand{\g}{\vec{g}}
 \newcommand{\h}{\vec{h}}
 \renewcommand{\o}{\vec{o}}

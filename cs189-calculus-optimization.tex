@@ -8,12 +8,14 @@ If $\calX$ is the entire domain of the function being optimized (as it often wil
 Otherwise the problem is \term{constrained} and may be much harder to solve, depending on the nature of the feasible set.
 
 Suppose $f : \R^d \to \R$.
-A point $\x$ is said to be a \term{local minimum} (resp. \term{local maximum}) of $f$ in $\calX$ if $f(\x) \leq f(\y)$ (resp. $f(\x) \geq f(\y)$) for all $\y$ in some neighborhood $\calN \subseteq \calX$ that contains $\x$.
+A point $\x$ is said to be a \term{local minimum} (resp. \term{local maximum}) of $f$ in $\calX$ if $f(\x) \leq f(\y)$ (resp. $f(\x) \geq f(\y)$) for all $\y$ in some neighborhood $N \subseteq \calX$ about $\x$.\footnote{
+	A \textbf{neighborhood} about $\x$ is an open set which contains $\x$.
+}
 Furthermore, if $f(\x) \leq f(\y)$ for all $\y \in \calX$, then $\x$ is a \term{global minimum} of $f$ in $\calX$ (similarly for global maximum).
 If the phrase ``in $\calX$'' is unclear from context, assume we are optimizing over the whole domain of the function.
 
 The qualifier \term{strict} (as in e.g. a strict local minimum) means that the inequality sign in the definition is actually a $>$ or $<$, with equality not allowed.
-This indicates that the extremum is unique.
+This indicates that the extremum is unique within some neighborhood.
 
 Observe that maximizing a function $f$ is equivalent to minimizing $-f$, so optimization problems are typically phrased in terms of minimization without loss of generality.
 This convention (which we follow here) eliminates the need to discuss minimization and maximization separately.
@@ -42,9 +44,9 @@ Note the special case $m = 1$, where $\nabla f = \mat{J}_f\tran$.
 \subsection{The Hessian}
 The \term{Hessian} matrix of $f : \R^d \to \R$ is a matrix of second-order partial derivatives:
 \[\nabla^2 f = \matlit{
-	\pdv[2]{f}{x_1} & \hdots & \pdv{f}{x_1}{x_n} \\
+	\pdv[2]{f}{x_1} & \hdots & \pdv{f}{x_1}{x_d} \\
 	\vdots & \ddots & \vdots \\
-	\pdv{f}{x_n}{x_1} & \hdots & \pdv[2]{f}{x_n}}
+	\pdv{f}{x_d}{x_1} & \hdots & \pdv[2]{f}{x_d}}
 \tab\text{i.e.}\tab
 [\nabla^2 f]_{ij} = {\pdv{f}{x_i}{x_j}}\]
 Recall that if the partial derivatives are continuous, the order of differentiation can be interchanged (Clairaut's theorem), so the Hessian matrix will be symmetric.
@@ -91,7 +93,7 @@ Suppose $f : \R^d \to \R$ is continuously differentiable, and let $\h \in \R^d$.
 Then there exists $t \in (0,1)$ such that
 \[f(\x + \h) = f(\x) + \nabla f(\x + t\h)\tran\h\]
 Furthermore, if $f$ is twice continuously differentiable, then
-\[\nabla f(\x + \h) = \nabla f(\x) + \int_0^1 \nabla^2 f(\x + t\h)\h \dif{t}\]
+\[\nabla f(\x + \h) = \nabla f(\x) + \int_0^1 \nabla^2 f(\x + t\h)\h \dd{t}\]
 and there exists $t \in (0,1)$ such that
 \[f(\x + \h) = f(\x) + \nabla f(\x)\tran\h + \frac{1}{2}\h\tran\nabla^2f(\x+t\h)\h\]
 \end{theorem}
@@ -150,14 +152,14 @@ Then $\x^*$ is a local minimum of $f$.
 Furthermore if $\nabla^2 f(\x^*)$ is positive definite, then $\x^*$ is a strict local minimum.
 \end{proposition}
 \begin{proof}
-Let $\calB$ be an open ball of radius $r > 0$ centered at $\x^*$ which is contained in the neighborhood.
+Let $B$ be an open ball of radius $r > 0$ centered at $\x^*$ which is contained in the neighborhood.
 Applying Taylor's theorem, we have that for any $\h$ with $\|\h\|_2 < r$, there exists $t \in (0,1)$ such that
 \[f(\x^* + \h) = f(\x^*) + \underbrace{\h\tran\nabla f(\x^*)}_0 + \frac{1}{2}\h\tran\nabla^2 f(\x^* + t\h)\h \geq f(\x^*)\]
 The last inequality holds because $\nabla^2 f(\x^* + t\h)$ is positive semi-definite (since $\|t\h\|_2 = t\|\h\|_2 < \|\h\|_2 < r$), so $\h\tran\nabla^2 f(\x^* + t\h)\h \geq 0$.
 Since $f(\x^*) \leq f(\x^* + \h)$ for all directions $\h$ with $\|\h\|_2 < r$, we conclude that $\x^*$ is a local minimum.
 
 Now further suppose that $\nabla^2 f(\x^*)$ is strictly positive definite.
-Since the Hessian is continuous we can choose another ball $\calB'$ with radius $r' > 0$ centered at $\x^*$ such that $\nabla^2 f(\x)$ is positive definite for all $\x \in \calB'$.
+Since the Hessian is continuous we can choose another ball $B'$ with radius $r' > 0$ centered at $\x^*$ such that $\nabla^2 f(\x)$ is positive definite for all $\x \in B'$.
 Then following the same argument as above (except with a strict inequality now since the Hessian is positive definite) we have $f(\x^* + \h) > f(\x^*)$ for all $\h$ with $0 < \|\h\|_2 < r'$.
 Hence $\x^*$ is a strict local minimum.
 \end{proof}
@@ -173,3 +175,88 @@ Also, if $\nabla^2 f(\x^*)$ is strictly positive definite, the continuity assump
 
 \subsection{Convexity}
 \input{cs189-convexity.tex}
+
+\subsection{Orthogonal projections}
+We now consider a particular kind of optimization problem that is particularly well-understood and can often be solved in closed form: given some point $\x$ in an inner product space $V$, find the closest point to $\x$ in a subspace $S$ of $V$.
+This process is referred to as \term{projection onto a subspace}.
+
+The following diagram should make it geometrically clear that, at least in Euclidean space, the solution is intimately related to orthogonality and the Pythagorean theorem:
+\begin{center}
+\includegraphics[width=0.5\linewidth]{orthogonal-projection}
+\end{center}
+Here $\y$ is an arbitrary element of the subspace $S$, and $\y^*$ is the point in $S$ such that $\x-\y^*$ is perpendicular to $S$.
+The hypotenuse of a right triangle (in this case $\|\x-\y\|$) is always longer than either of the legs (in this case $\|\x-\y^*\|$ and $\|\y^*-\y\|$), and when $\y \neq \y^*$ there always exists such a triangle between $\x$, $\y$, and $\y^*$.
+
+Our intuition from Euclidean space suggests that the closest point to $\x$ in $S$ has the perpendicularity property described above, and we now show that this is indeed the case.
+\begin{proposition}
+Suppose $\x \in V$ and $\y \in S$.
+Then $\y^*$ is the unique minimizer of $\|\x-\y\|$ over $\y \in S$ if and only if $\x-\y^* \perp S$.
+\end{proposition}
+\begin{proof}
+$(\implies)$
+Suppose $\y^*$ is the unique minimizer of $\|\x-\y\|$ over $\y \in S$.
+That is, $\|\x-\y^*\| \leq \|\x-\y\|$ for all $\y \in S$, with equality only if $\y = \y^*$.
+Fix $\vec{v} \in S$ and observe that
+\begin{align*}
+g(t) &:= \|\x-\y^*+t\vec{v}\|^2 \\
+&= \inner{\x-\y^*+t\vec{v}}{\x-\y^*+t\vec{v}} \\
+&= \inner{\x-\y^*}{\x-\y^*} - 2t\inner{\x-\y^*}{\vec{v}} + t^2\inner{\vec{v}}{\vec{v}} \\
+&= \|\x-\y^*\|^2 - 2t\inner{\x-\y^*}{\vec{v}} + t^2\|\vec{v}\|^2
+\end{align*}
+must have a minimum at $t = 0$ as a consequence of this assumption.
+Thus
+\[0 = g'(0) = \left.-2\inner{\x-\y^*}{\vec{v}} + 2t\|\vec{v}\|^2\right|_{t=0} = -2\inner{\x-\y^*}{\vec{v}}\]
+giving $\x-\y^* \perp \vec{v}$.
+Since $\vec{v}$ was arbitrary in $S$, we have $\x-\y^* \perp S$ as claimed.
+
+$(\impliedby)$
+Suppose $\x-\y^* \perp S$.
+Observe that for any $\y \in S$, $\y^*-\y \in S$ because $\y^* \in S$ and $S$ is closed under subtraction.
+Under the hypothesis, $\x-\y^* \perp \y^*-\y$, so by the Pythagorean theorem,
+\[\|\x-\y\| = \|\x-\y^*+\y^*-\y\| = \|\x-\y^*\| + \|\y^*-\y\| \geq \|\x - \y^*\|\]
+and in fact the inequality is strict when $\y \neq \y^*$ since this implies $\|\y^*-\y\| > 0$.
+Thus $\y^*$ is the unique minimizer of $\|\x-\y\|$ over $\y \in S$.
+\end{proof}
+Since a unique minimizer in $S$ can be found for any $\x \in V$, we can define an operator
+\[P\x = \argmin_{\y \in S} \|\x-\y\|\]
+Observe that $P\y = \y$ for any $\y \in S$, since $\y$ has distance zero from itself and every other point in $S$ has positive distance from $\y$.
+Thus $P(P\x) = P\x$ for any $\x$ (i.e., $P^2 = P$) because $P\x \in S$.
+The identity $P^2 = P$ is actually one of the defining properties of a \term{projection}, the other being linearity.
+
+An immediate consequence of the previous result is that $\x - P\x \perp S$ for any $\x \in V$, and conversely that $P$ is the unique operator that satisfies this property for all $\x \in V$.
+For this reason, $P$ is known as an \term{orthogonal projection}.
+
+If we choose an orthonormal basis for the target subspace $S$, it is possible to write down a more specific expression for $P$.
+\begin{proposition}
+If $\e_1, \dots, \e_m$ is an orthonormal basis for $S$, then
+\[P\x = \sum_{i=1}^m \inner{\x}{\e_i}\e_i\]
+\end{proposition}
+\begin{proof}	
+Let $\e_1, \dots, \e_m$ be an orthonormal basis for $S$, and suppose $\x \in V$.
+Then for all $j = 1, \dots, m$,
+\begin{align*}
+\biginner{\x-\sum_{i=1}^m \inner{\x}{\e_i}\e_i}{\e_j} &= \inner{\x}{\e_j} - \sum_{i=1}^m \inner{\x}{\e_i}\underbrace{\inner{\e_i}{\e_j}}_{\delta_{ij}} \\
+&= \inner{\x}{\e_j} - \inner{\x}{\e_j} \\
+&= 0
+\end{align*}
+We have shown that the claimed expression, call it $\tilde{P}\x$, satisfies $\x - \tilde{P}\x \perp \e_j$ for every element $\e_j$ of the orthonormal basis for $S$.
+It follows (by linearity of the inner product) that $\x - \tilde{P}\x \perp S$, so the previous result implies $P = \tilde{P}$.
+\end{proof}
+The fact that $P$ is a linear operator (and thus a proper projection, as earlier we showed $P^2 = P$) follows readily from this result.
+
+%Another useful fact about the orthogonal projection operator is that the metric it induces is \term{non-expansive}, i.e. $1$-Lipschitz.
+%\begin{proposition}
+%For any $\x \in V$,
+%\[\|P\x\| \leq \|\x\|\]
+%Thus for any $\x, \xye \in V$,
+%\[\|P\x - P\xye\| \leq \|\x-\xye\|\]
+%\end{proposition}
+%\begin{proof}
+%Suppose $\x \in V$.
+%Then
+%\[\|P\x\|^2 = \inner{P\x}{P\x} = \inner{\x}{P^2\x} = \inner{\x}{P\x} \leq \|\x\|\|P\x\|\]
+%using respectively the self-adjointness of $P$, the fact that $P^2 = P$, and the Cauchy-Schwarz inequality.
+%If $\|P\x\| = 0$, the inequality holds vacuously; otherwise we can divide both sides by $\|P\x\|$ to obtain $\|P\x\| \leq \|\x\|$.
+%
+%The second statement follows immediately from the first by linearity of $P$.
+%\end{proof}

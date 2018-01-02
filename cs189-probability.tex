@@ -1,5 +1,4 @@
 Probability theory provides powerful tools for modeling and dealing with uncertainty.
-It is used extensively in machine learning, particularly to construct and analyze classifiers.
 
 \subsection{Basics}
 Suppose we have some sort of randomized experiment (e.g. a coin toss, die roll) that has a fixed set of possible outcomes.
@@ -9,6 +8,7 @@ We would like to define probabilities for some \term{events}, which are subsets 
 The set of events is denoted $\calF$.\footnote{
     $\calF$ is required to be a $\sigma$-algebra for technical reasons; see \cite{rigorousprob}.
 }
+The \term{complement} of the event $A$ is another event, $A\comp = \Omega \setminus A$.
 
 Then we can define a \term{probability measure} $\P : \calF \to [0,1]$ which must satisfy
 \begin{enumerate}[(i)]
@@ -146,8 +146,8 @@ However, they do have a couple of reasonable interpretations.
 One is as relative probabilities; even though the probability of each particular value being picked is technically zero, some points are still in a sense more likely than others.
 
 One can also think of the density as determining the probability that the variable will lie in a small range about a given value.
-Recall that for small $\epsilon$,
-\[\pr{x-\nicefrac{\epsilon}{2} \leq X \leq x+\nicefrac{\epsilon}{2}} = \int_{x-\nicefrac{\epsilon}{2}}^{x+\nicefrac{\epsilon}{2}} p(z)\dd{z} \approx \epsilon p(x)\]
+This is because, for small $\epsilon > 0$,
+\[\pr{x-\epsilon \leq X \leq x+\epsilon} = \int_{x-\epsilon}^{x+\epsilon} p(z)\dd{z} \approx 2\epsilon p(x)\]
 using a midpoint approximation to the integral.
 
 Here are some useful identities that follow from the definitions above:

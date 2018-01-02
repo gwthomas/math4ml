@@ -19,7 +19,7 @@ We care about measure theory because of its use in the modern, rigorous formulat
 \section{Collections of sets}
 We would like to assign measures to various subsets of $\R^n$ characterizing their size.
 Ideally our measure $\mu$ would satisfy
-\begin{enumerate}
+\begin{enumerate}[(i)]
 \item For any countable collection of disjoint sets $E_1, E_2, \dots \subseteq \R^n$,
 \[\mu\bigg(\bigcup_i E_i\bigg) = \sum_i \mu(E_i)\]
 \item If two sets $E, F \subseteq \R^n$ are such that $E$ can be transformed into $F$ by rigid transformations, then $\mu(E) = \mu(F)$.
@@ -42,15 +42,15 @@ In particular, we choose the collections so that the properties above hold, not 
 \subsection{Algebras and $\sigma$-algebras}
 Let $\Omega$ be a non-empty set.
 Then $\calA \subseteq \calP(\Omega)$ is an algebra on $\Omega$ if
-\begin{enumerate}
+\begin{enumerate}[(i)]
 \item $\calA$ is non-empty.
-\item If $E \in \calA$, then $E^c = \Omega \setminus E \in \calA$.
+\item If $E \in \calA$, then $E\comp = \Omega \setminus E \in \calA$.
 \item If $E_1, \dots, E_n \in \calA$, then $\bigcup_{i=1}^n E_i \in \calA$.
 \end{enumerate}
 The second property states that $\calA$ is \term{closed under complements}.
 Using de Morgan's laws, properties 2 and 3 collectively imply that $\calA$ is closed under finite intersections as well, since
-\[\bigcap_{i=1}^n E_i = \bigg(\bigcup_{i=1}^n E_i^c\bigg)^c\]
-Then we must have $\varnothing \in \calA$; since $\calA$ is non-empty there exists some $E \in \calA$, so $E^c \in \calA$, and hence $\varnothing = E \cap E^c \in \calA$.
+\[\bigcap_{i=1}^n E_i = \bigg(\bigcup_{i=1}^n E_i\comp\bigg)\comp\]
+Then we must have $\varnothing \in \calA$; since $\calA$ is non-empty there exists some $E \in \calA$, so $E\comp \in \calA$, and hence $\varnothing = E \cap E\comp \in \calA$.
 
 In light of the desirability of countable additivity, we would like the collection of subsets we consider to be closed under unions of countably many sets, not just finitely many.
 Thus we need to strengthen condition 3, and arrive at the following definition: a \term{$\sigma$-algebra} is an algebra that is closed under countable unions.
@@ -67,7 +67,7 @@ If $\calC \subseteq \calP(\Omega)$ is any collection of subsets of $\Omega$, the
 Let $\Omega$ be a non-empty set and $\calM \subseteq \calP(\Omega)$ a $\sigma$-algebra.
 The pair $(\Omega, \calM)$ is called a \term{measurable space}, and the elements of $\calM$ are its \term{measurable sets}.
 A \term{measure} on $(\Omega, \calM)$ is a function $\mu : \calM \to [0,\infty]$ such that
-\begin{enumerate}
+\begin{enumerate}[(i)]
 \item $\mu(\varnothing) = 0$
 \item For any countable collection of disjoint sets $\{E_i\} \subseteq \calM$,
 \[\mu\bigg(\bigdotcup_i E_i\bigg) = \sum_i \mu(E_i)\]
@@ -130,7 +130,7 @@ For infinite intervals, use the ``obvious'' convention that $\infty-a = \infty$ 
 The key tool in constructing Lebesgue measure is the \term{Lebesgue outer measure} $\lambda^* : \calP(\R) \to [0,\infty]$, which is given by
 \[\lambda^*(E) = \inf\left\{\sum_{k=1}^\infty \ell(I_k) : I_k \in \calI, E \subseteq \bigcup_{k=1}^\infty I_k\right\}\]
 A set $E \subseteq \R$ is said to be \term{Lebesgue measurable} if for every $A \subseteq \R$,
-\[\lambda^*(A) = \lambda^*(A \cap E) + \lambda^*(A \cap E^c)\]
+\[\lambda^*(A) = \lambda^*(A \cap E) + \lambda^*(A \cap E\comp)\]
 It turns out that the set of Lebesgue measurable sets is very large and contains pretty much any reasonable set that one would encounter in practice.
 However, it is possible\footnote{
     assuming the axiom of choice
@@ -243,11 +243,11 @@ Conversely if $\pr{A} = 0$, we say that $A$ occurs \term{almost never}.
 
 From these axioms, a number of useful rules can be derived.
 \begin{proposition}
-If $A$ is an event, then $\pr{A^c} = 1 - \pr{A}$.
+If $A$ is an event, then $\pr{A\comp} = 1 - \pr{A}$.
 \end{proposition}
 \begin{proof}
 Using the countable additivity of $\pm$, we have
-\[\pr{A} + \pr{A^c} = \pr{A \dotcup A^c} = \pr{\Omega} = 1\]
+\[\pr{A} + \pr{A\comp} = \pr{A \dotcup A\comp} = \pr{\Omega} = 1\]
 which proves the result.
 \end{proof}
 

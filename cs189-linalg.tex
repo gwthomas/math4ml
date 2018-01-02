@@ -27,7 +27,28 @@ Addition and scalar multiplication are defined component-wise on vectors in $\R^
 \[\x + \y = \matlit{x_1 + y_1 \\ \vdots \\ x_n + y_n}, \tab \alpha\x = \matlit{\alpha x_1 \\ \vdots \\ \alpha x_n}\]
 Euclidean space is used to mathematically represent physical space, with notions such as distance, length, and angles.
 Although it becomes hard to visualize for $n > 3$, these concepts generalize mathematically in obvious ways.
-Tip: even when you're working in more general settings than $\R^n$, it is often useful to visualize vector addition and scalar multiplication in terms of 2D vectors in the plane or 3D vectors in space.
+Even when you're working in more general settings than $\R^n$, it is often useful to visualize vector addition and scalar multiplication in terms of 2D vectors in the plane or 3D vectors in space.
+
+\subsubsection{Subspaces}
+Vector spaces can contain other vector spaces.
+If $V$ is a vector space, then $S \subseteq V$ is said to be a \term{subspace} of $V$ if
+\begin{enumerate}[(i)]
+\item $\vec{0} \in S$
+\item $S$ is closed under addition: $\x, \y \in S$ implies $\x+\y \in S$
+\item $S$ is closed under scalar multiplication: $\x \in S, \alpha \in \R$ implies $\alpha\x \in S$
+\end{enumerate}
+Note that $V$ is always a subspace of $V$, as is the trivial vector space which contains only $\vec{0}$.
+
+As a concrete example, a line passing through the origin is a subspace of Euclidean space.
+
+Some of the most important subspaces are those induced by linear maps.
+If $T : V \to W$ is a linear map, we define the \term{nullspace}\footnote{
+	It is sometimes called the \term{kernel} by algebraists, but we eschew this terminology because the word ``kernel'' has another meaning in machine learning.
+} of $T$ as
+\[\Null(T) = \{\x \in V \mid T\x = \vec{0}\}\]
+and the \term{range} (or the \term{columnspace} if we are considering the matrix form) of $T$ as
+\[\range(T) = \{\y \in W \mid \text{$\exists \x \in V$ such that $T\x = \y$}\}\]
+It is a good exercise to verify that the nullspace and range of a linear map are always subspaces of its domain and codomain, respectively.
 
 \subsection{Metric spaces}
 Metrics generalize the notion of distance from Euclidean space (although metric spaces need not be vector spaces).
@@ -91,12 +112,12 @@ A vector space endowed with an inner product is called an \term{inner product sp
 
 Note that any inner product on $V$ induces a norm on $V$:
 \[\|\x\| = \sqrt{\inner{\x}{\x}}\]
-One can verify that the axioms for norms are satisfied under this definition and follow directly from the axioms for inner products.
+One can verify that the axioms for norms are satisfied under this definition and follow (almost) directly from the axioms for inner products.
 Therefore any inner product space is also a normed space (and hence also a metric space).\footnote{
     If an inner product space is complete with respect to the distance metric induced by its inner product, we say that it is a \term{Hilbert space}.
 }
 
-Two vectors $\x$ and $\y$ are said to be \term{orthogonal} if $\inner{\x}{\y} = 0$.
+Two vectors $\x$ and $\y$ are said to be \term{orthogonal} if $\inner{\x}{\y} = 0$; we write $\x \perp \y$ for shorthand.
 Orthogonality generalizes the notion of perpendicularity from Euclidean space.
 If two orthogonal vectors $\x$ and $\y$ additionally have unit length (i.e. $\|\x\| = \|\y\| = 1$), then they are described as \term{orthonormal}.
 
@@ -109,11 +130,11 @@ The reader can verify that the two-norm $\|\cdot\|_2$ on $\R^n$ is induced by th
 \subsubsection{Pythagorean Theorem}
 The well-known Pythagorean theorem generalizes naturally to arbitrary inner product spaces.
 \begin{theorem}
-If $\inner{\x}{\y} = 0$, then
+If $\x \perp \y$, then
 \[\|\x+\y\|^2 = \|\x\|^2 + \|\y\|^2\]
 \end{theorem}
 \begin{proof}
-Suppose $\inner{\x}{\y} = 0$. Then
+Suppose $\x \perp \y$, i.e. $\inner{\x}{\y} = 0$. Then
 \[\|\x+\y\|^2 = \inner{\x+\y}{\x+\y} = \inner{\x}{\x} + \inner{\y}{\x} + \inner{\x}{\y} + \inner{\y}{\y} = \|\x\|^2 + \|\y\|^2\]
 as claimed.
 \end{proof}
@@ -159,7 +180,7 @@ Then
 \[\x = \A\inv\A\x = \A\inv(\lambda\x) = \lambda\A\inv\x\]
 Dividing by $\lambda$, which is valid because the invertibility of $\A$ implies $\lambda \neq 0$, gives $\lambda\inv\x = \A\inv\x$.
 
-(iii) The case $k \geq 0$ follows almost immediately by induction on $k$.
+(iii) The case $k \geq 0$ follows immediately by induction on $k$.
 Then the general case $k \in \Z$ follows by combining the $k \geq 0$ case with (ii).
 \end{proof}
 
@@ -169,12 +190,14 @@ The \term{trace} of a square matrix is the sum of its diagonal entries:
 The trace has several nice algebraic properties:
 \begin{enumerate}[(i)]
 \item $\tr(\A+\mat{B}) = \tr(\A) + \tr(\mat{B})$
-\item $\tr(\alpha \A) = \alpha\tr(\A)$
+\item $\tr(\alpha\A) = \alpha\tr(\A)$
 \item $\tr(\A\tran) = \tr(\A)$
-\item $\tr(\A\mat{B}\mat{C}\mat{D}) = \tr(\mat{B}\mat{C}\mat{D}\A) = \tr(\mat{C}\mat{D}\A\mat{B}) = \tr(\mat{B}\A\mat{D}\mat{C})$
+\item $\tr(\A\mat{B}\mat{C}\mat{D}) = \tr(\mat{B}\mat{C}\mat{D}\A) = \tr(\mat{C}\mat{D}\A\mat{B}) = \tr(\mat{D}\A\mat{B}\mat{C})$
 \end{enumerate}
 The first three properties follow readily from the definition.
-The last is known as \term{invariance under cyclic permutations}. Note that the matrices cannot be reordered arbitrarily, for example $\tr(\A\mat{B}\mat{C}\mat{D}) \neq \tr(\mat{B}\A\mat{C}\mat{D})$ in general.
+The last is known as \term{invariance under cyclic permutations}.
+Note that the matrices cannot be reordered arbitrarily, for example $\tr(\A\mat{B}\mat{C}\mat{D}) \neq \tr(\mat{B}\A\mat{C}\mat{D})$ in general.
+Also, there is nothing special about the product of four matrices -- analogous rules hold for more or fewer matrices.
 
 Interestingly, the trace of a matrix is equal to the sum of its eigenvalues (repeated according to multiplicity):
 \[\tr(\A) = \sum_i \lambda_i(\A)\]
@@ -192,11 +215,7 @@ But it's good to know the properties:
 Interestingly, the determinant of a matrix is equal to the product of its eigenvalues (repeated according to multiplicity):
 \[\det(\A) = \prod_i \lambda_i(\A)\]
 
-\subsection{Special kinds of matrices}
-There are several ways matrices can be classified.
-Each categorization implies some potentially desirable properties, so it's always good to know what kind of matrix you're dealing with.
-
-\subsubsection{Orthogonal matrices}
+\subsection{Orthogonal matrices}
 A matrix $\mat{Q} \in \R^{n \times n}$ is said to be \term{orthogonal} if its columns are pairwise orthonormal.
 This definition implies that
 \[\mat{Q}\tran \mat{Q} = \mat{Q}\mat{Q}\tran = \I\]
@@ -206,92 +225,26 @@ A direct result of this fact is that they also preserve 2-norms:
 \[\|\mat{Q}\x\|_2 = \sqrt{(\mat{Q}\x)\tran(\mat{Q}\x)} = \sqrt{\x\tran\x} = \|\x\|_2\]
 Therefore multiplication by an orthogonal matrix can be considered as a transformation that preserves length, but may rotate or reflect the vector about the origin.
 
-\subsubsection{Symmetric matrices}
-A matrix $\A \in \R^{n \times n}$ is said to be \term{symmetric} if it is equal to its own transpose ($\A = \A\tran$).
+\subsection{Symmetric matrices}
+A matrix $\A \in \R^{n \times n}$ is said to be \term{symmetric} if it is equal to its own transpose ($\A = \A\tran$), meaning that $A_{ij} = A_{ji}$ for all $(i,j)$.
 This definition seems harmless enough but turns out to have some strong implications.
 We summarize the most important of these as
 \begin{theorem}
 (Spectral Theorem)
-Let $\A \in \R^{n \times n}$ be symmetric.
-Then there exists an orthonormal basis for $\R^n$ consisting of eigenvectors of $\A$.
+If $\A \in \R^{n \times n}$ is symmetric, then there exists an orthonormal basis for $\R^n$ consisting of eigenvectors of $\A$.
 \end{theorem}
-This theorem allows us to factor symmetric matrices as follows:
+The practical application of this theorem is a particular factorization of symmetric matrices, referred to as the \term{eigendecomposition} or \term{spectral decomposition}.
+Denote the orthonormal basis of eigenvectors $\q_1, \dots, \q_n$ and their eigenvalues $\lambda_1, \dots, \lambda_n$.
+Let $\mat{Q}$ be an orthogonal matrix with $\q_1, \dots, \q_n$ as its columns, and $\mat{\Lambda} = \diag(\lambda_1, \dots, \lambda_n)$.
+Since by definition $\A\q_i = \lambda_i\q_i$ for every $i$, the following relationship holds:
+\[\A\mat{Q} = \mat{Q}\mat{\Lambda}\]
+Right-multiplying by $\mat{Q}\tran$, we arrive at the decomposition
 \[\A = \mat{Q}\mat{\Lambda}\mat{Q}\tran\]
-Here $\mat{Q}$ is an orthogonal matrix with the aforementioned orthogonal basis as its columns, and $\mat{\Lambda} = \diag(\lambda_1, \dots, \lambda_n)$, where $\lambda_1, \dots, \lambda_n \in \R$ are the corresponding eigenvalues\footnote{
-        The fact that the eigenvalues are real also follows from the symmetry of $\A$.
-} of $\A$.
-This is referred to as the \term{eigendecomposition} or \term{spectral decomposition} of $\A$.
-
-\subsubsection{Positive (semi-)definite matrices}
-A symmetric matrix $\A$ is \term{positive definite} if for all nonzero $\x \in \R^n$, $\x\tran\A\x > 0$.
-Sometimes people write $\A \succ 0$ to indicate that $\A$ is positive definite.
-Positive definite matrices have all positive eigenvalues and diagonal entries.
-
-A symmetric matrix $\A$ is \term{positive semi-definite} if for all $\x \in \R^n$, $\x\tran\A\x \geq 0$.
-Sometimes people write $\A \succeq 0$ to indicate that $\A$ is positive semi-definite.
-Positive semi-definite matrices have all nonnegative eigenvalues and diagonal entries.
-
-Positive definite and positive semi-definite matrices will come up very frequently!
-Note that since these matrices are also symmetric, the properties of symmetric matrices apply here as well.
-
-As an example of how these matrices arise, the matrix $\A\tran\A$ is positive semi-definite for any $\A \in \R^{m \times n}$, since
-\[\x\tran (\A\tran\A)\x = (\A\x)\tran(\A\x) = \|\A\x\|_2^2 \geq 0\]
-for any $\x \in \R^n$.
-
-\subsection{Singular value decomposition}
-Singular value decomposition (SVD) is a widely applicable tool in linear algebra.
-Its strength stems partially from the fact that \textit{every matrix} $\A \in \R^{m \times n}$ has an SVD (even non-square matrices)!
-The decomposition goes as follows:
-\[\A = \mat{U}\mat{\Sigma}\mat{V}\tran\]
-where $\mat{U} \in \R^{m \times m}$ and $\mat{V} \in \R^{n \times n}$ are orthogonal matrices and $\mat{\Sigma} \in \R^{m \times n}$ is a diagonal matrix with the \term{singular values} of $\A$ (denoted $\sigma_i$) on its diagonal.
-The singular values of $\A$ are defined as the square roots of the eigenvalues of $\A\tran\A$ (or equivalently, of $\A\A\tran$).
-
-By convention, the singular values are given in non-increasing order, i.e.
-\[\sigma_1 \geq \sigma_2 \geq \dots \geq \sigma_{\min(m,n)} \geq 0\]
-Only the first $r$ singular values are nonzero, where $r$ is the rank of $\A$.
-
-The columns of $\mat{U}$ are called the \term{left-singular vectors} of $\A$, and they are eigenvectors of $\A\A\tran$.
-(Try showing this!)
-The columns of $\mat{V}$ are called the \term{right-singular vectors} of $\A$, and they are eigenvectors of $\A\tran\A$.
-
-\subsection{Some useful matrix identities}
-\subsubsection{Matrix-vector product as linear combination of matrix columns}
-\begin{proposition}
-Let $\x \in \R^n$ be a vector and $\A \in \R^{m \times n}$ a matrix with columns $\a_1, \dots, \a_n$.
-Then
-\[\A\x = \sum_{i=1}^n x_i\a_i\]
-\end{proposition}
-This identity is extremely useful in understanding linear operators in terms of their matrices' columns.
-The proof is very simple (consider each element of $\A\x$ individually and expand by definitions) but it is a good exercise to convince yourself.
-
-\subsubsection{Sum of outer products as matrix-matrix product}
-An \term{outer product} is an expression of the form $\a\b\tran$, where $\a \in \R^m$ and $\b \in \R^n$.
-By inspection it is not hard to see that such an expression yields an $m \times n$ matrix such that
-\[[\a\b\tran]_{ij} = a_ib_j\]
-It is not immediately obvious, but the sum of outer products is actually equivalent to an appropriate matrix-matrix product!
-We formalize this statement as
-\begin{proposition}
-Let $\a_1, \dots, \a_k \in \R^m$ and $\b_1, \dots, \b_k \in \R^n$. Then
-\[\sum_{\ell=1}^k \a_\ell\b_\ell\tran = \mat{A}\mat{B}\tran\]
-where
-\[\mat{A} = \matlit{\a_1 & \cdots & \a_k}, \tab \mat{B} = \matlit{\b_1 & \cdots & \b_k}\]
-\end{proposition}
-\begin{proof}
-For each $(i,j)$, we have
-\[\left[\sum_{\ell=1}^k \a_\ell\b_\ell\tran\right]_{ij} = \sum_{\ell=1}^k [\a_\ell\b_\ell\tran]_{ij} = \sum_{\ell=1}^k [\a_\ell]_i[\b_\ell]_j = \sum_{\ell=1}^k A_{i\ell}B_{j\ell}\]
-This last expression should be recognized as an inner product between the $i$th row of $\A$ and the $j$th row of $\mat{B}$, or equivalently the $j$th column of $\mat{B}\tran$.
-Hence by the definition of matrix multiplication, it is equal to $[\mat{A}\mat{B}\tran]_{ij}$.
-\end{proof}
-
-\subsection{Quadratic forms}
-Let $\A \in \R^{n \times n}$ be a symmetric matrix.
-The expression $\x\tran\A\x$ is called a \term{quadratic form} and comes up all the time.
-It is in some cases helpful to rewrite quadratic forms in terms of the individual elements that make up $\A$ and $\x$:
-\[\x\tran\A\x = \sum_{i=1}^n\sum_{j=1}^n A_{ij}x_ix_j\]
-This identity is not hard to show, but the derivation is somewhat tedious, so we omit it.
-The result can be used, for example, to derive $\nabla_\x(\x\tran\A\x)$, as well as to prove that all the diagonal entries of a positive-definite matrix are positive.
 
 \subsubsection{Rayleigh quotients}
+Let $\A \in \R^{n \times n}$ be a symmetric matrix.
+The expression $\x\tran\A\x$ is called a \term{quadratic form}.
+
 There turns out to be an interesting connection between the quadratic form of a symmetric matrix and its eigenvalues.
 This connection is provided by the \term{Rayleigh quotient}
 \[R_\A(\x) = \frac{\x\tran\A\x}{\x\tran\x}\]
@@ -336,36 +289,147 @@ For all $\x \neq \vec{0}$,
 with equality if and only if $\x$ is a corresponding eigenvector.
 \end{theorem}
 
+\subsection{Positive (semi-)definite matrices}
+A symmetric matrix $\A$ is \term{positive semi-definite} if for all $\x \in \R^n$, $\x\tran\A\x \geq 0$.
+Sometimes people write $\A \succeq 0$ to indicate that $\A$ is positive semi-definite.
+
+A symmetric matrix $\A$ is \term{positive definite} if for all nonzero $\x \in \R^n$, $\x\tran\A\x > 0$.
+Sometimes people write $\A \succ 0$ to indicate that $\A$ is positive definite.
+Note that positive definiteness is a strictly stronger property than positive semi-definiteness, in the sense that every positive definite matrix is positive semi-definite but not vice-versa. 
+
+These properties are related to eigenvalues in the following way.
+\begin{proposition}
+A symmetric matrix is positive semi-definite if and only if all of its eigenvalues are nonnegative, and positive definite if and only if all of its eigenvalues are positive.
+\end{proposition}
+\begin{proof}
+Suppose $A$ is positive semi-definite, and let $\x$ be an eigenvector of $\A$ with eigenvalue $\lambda$.
+Then
+\[0 \leq \x\tran\A\x = \x\tran(\lambda\x) = \lambda\x\tran\x = \lambda\|\x\|_2^2\]
+Since $\x \neq \vec{0}$ (by the assumption that it is an eigenvector), we have $\|\x\|_2^2 > 0$, so we can divide both sides by $\|\x\|_2^2$ to arrive at $\lambda \geq 0$.
+If $\A$ is positive definite, the inequality above holds strictly, so $\lambda > 0$.
+This proves one direction.
+
+To simplify the proof of the other direction, we will use the machinery of Rayleigh quotients.
+Suppose that $\A$ is symmetric and all its eigenvalues are nonnegative.
+Then for all $\x \neq \vec{0}$,
+\[0 \leq \lambda_{\min}(\A) \leq R_\A(\x)\]
+Since $\x\tran\A\x$ matches $R_\A(\x)$ in sign, we conclude that $\A$ is positive semi-definite.
+If the eigenvalues of $\A$ are all strictly positive, then $0 < \lambda_{\min}(\A)$, whence it follows that $\A$ is positive definite.
+\end{proof}
+As an example of how these matrices arise, consider
+\begin{proposition}
+Suppose $\A \in \R^{m \times n}$.
+Then $\A\tran\A$ is positive semi-definite.
+If $\Null(\A) = \{\vec{0}\}$, then $\A\tran\A$ is positive definite.
+\end{proposition}
+\begin{proof}
+For any $\x \in \R^n$,
+\[\x\tran (\A\tran\A)\x = (\A\x)\tran(\A\x) = \|\A\x\|_2^2 \geq 0\]
+so $\A\tran\A$ is positive semi-definite.
+
+Note that $\|\A\x\|_2^2 = 0$ implies $\|\A\x\|_2 = 0$, which in turn implies $\A\x = \vec{0}$ (recall that this is a property of norms).
+If $\Null(\A) = \{\vec{0}\}$, $\A\x = \vec{0}$ implies $\x = \vec{0}$, so $\x\tran (\A\tran\A)\x = 0$ if and only if $\x = \vec{0}$, and thus $\A\tran\A$ is positive definite.
+\end{proof}
+Positive definite matrices are invertible (since their eigenvalues are nonzero), whereas positive semi-definite matrices might not be.
+However, if you already have a positive semi-definite matrix, it is possible to perturb its diagonal slightly to produce a positive definite matrix.
+\begin{proposition}
+If $\A$ is positive semi-definite and $\epsilon > 0$, then $\A + \epsilon\I$ is positive definite.
+\end{proposition}
+\begin{proof}
+Assuming $\A$ is positive semi-definite and $\epsilon > 0$, we have for any $\x \neq \vec{0}$ that
+\[\x\tran(\A+\epsilon\I)\x = \x\tran\A\x + \epsilon\x\tran\I\x = \underbrace{\x\tran\A\x}_{\geq 0} + \underbrace{\epsilon\|\x\|_2^2}_{> 0} > 0\]
+as claimed.
+\end{proof}
+An obvious but frequently useful consequence of the two propositions we have just shown is that $\A\tran\A + \epsilon\I$ is positive definite (and in particular, invertible) for \textit{any} matrix $\A$ and any $\epsilon > 0$.
+
 \subsubsection{The geometry of positive definite quadratic forms}
 A useful way to understand quadratic forms is by the geometry of their level sets.
-Recall that a \term{level set} or \term{isocontour} of a function is the set of all inputs such that the function applied to those inputs yields a given output.
+A \term{level set} or \term{isocontour} of a function is the set of all inputs such that the function applied to those inputs yields a given output.
 Mathematically, the $c$-isocontour of $f$ is $\{\x \in \dom f : f(\x) = c\}$.
 
 Let us consider the special case $f(\x) = \x\tran\mat{A}\x$ where $\mat{A}$ is a positive definite matrix.
-Since $\mat{A}$ is positive definite, it has a unique matrix square root $\A\halfpow = \mat{Q}\mat{\Lambda}\halfpow\mat{Q}\tran$, where $\mat{Q}\mat{\Lambda}\mat{Q}\tran = \A$ is the eigendecomposition of $\A$ and $\mat{\Lambda}\halfpow = \diag(\sqrt{\lambda_1}, \dots \sqrt{\lambda_d})$.
-It is easy to see that this matrix $\A\halfpow$ is positive definite and satisfies $\A\halfpow\A\halfpow = \A$.
-Fixing a value $c \geq 0$, the $c$-isocontour of $f$ is the set of $\x \in \R^d$ such that
+Since $\mat{A}$ is positive definite, it has a unique matrix square root $\A\halfpow = \mat{Q}\mat{\Lambda}\halfpow\mat{Q}\tran$, where $\mat{Q}\mat{\Lambda}\mat{Q}\tran$ is the eigendecomposition of $\A$ and $\mat{\Lambda}\halfpow = \diag(\sqrt{\lambda_1}, \dots \sqrt{\lambda_n})$.
+It is easy to see that this matrix $\A\halfpow$ is positive definite (consider its eigenvalues) and satisfies $\A\halfpow\A\halfpow = \A$.
+Fixing a value $c \geq 0$, the $c$-isocontour of $f$ is the set of $\x \in \R^n$ such that
 \[c = \x\tran\A\x = \x\tran\A\halfpow\A\halfpow\x = \|\A\halfpow\x\|_2^2\]
 where we have used the symmetry of $\A\halfpow$.
 Making the change of variable $\z = \A\halfpow\x$, we have the condition $\|\z\|_2 = \sqrt{c}$.
 That is, the values $\z$ lie on a sphere of radius $\sqrt{c}$.
 These can be parameterized as $\z = \sqrt{c}\hat{\z}$ where $\hat{\z}$ has $\|\hat{\z}\|_2 = 1$.
 Then since $\A\neghalfpow = \mat{Q}\mat{\Lambda}\neghalfpow\mat{Q}\tran$, we have
-\[\x = \A\neghalfpow\z = \mat{Q}\mat{\Lambda}\neghalfpow\mat{Q}\tran\sqrt{c}\hat{\z} = \mat{Q}(\sqrt{c}\mat{\Lambda}\neghalfpow)\tilde{\z}\]
+\[\x = \A\neghalfpow\z = \mat{Q}\mat{\Lambda}\neghalfpow\mat{Q}\tran\sqrt{c}\hat{\z} = \sqrt{c}\mat{Q}\mat{\Lambda}\neghalfpow\tilde{\z}\]
 where $\tilde{\z} = \mat{Q}\tran\hat{\z}$ also satisfies $\|\tilde{\z}\|_2 = 1$ since $\mat{Q}$ is orthogonal.
-Using this parameterization, we see that the solution set $\{\x \in \R^d : f(\x) = c\}$ is the image of the unit sphere $\{\tilde{\z} \in \R^d : \|\tilde{\z}\|_2 = 1\}$ under the invertible linear map $\x = \mat{Q}(\sqrt{c}\mat{\Lambda}\neghalfpow)\tilde{\z}$.
+Using this parameterization, we see that the solution set $\{\x \in \R^n : f(\x) = c\}$ is the image of the unit sphere $\{\tilde{\z} \in \R^n : \|\tilde{\z}\|_2 = 1\}$ under the invertible linear map $\x = \sqrt{c}\mat{Q}\mat{\Lambda}\neghalfpow\tilde{\z}$.
 
 What we have gained with all these manipulations is a clear algebraic understanding of the $c$-isocontour of $f$ in terms of a sequence of linear transformations applied to a well-understood set.
-We begin with the unit sphere, then scale every axis $i$ by $\sqrt{c}\lambda_i\neghalfpow$, resulting in an axis-aligned ellipsoid.
+We begin with the unit sphere, then scale every axis $i$ by $\lambda_i\neghalfpow$, resulting in an axis-aligned ellipsoid.
 Observe that the axis lengths of the ellipsoid are proportional to the inverse square roots of the eigenvalues of $\A$.
 Hence larger eigenvalues correspond to shorter axis lengths, and vice-versa.
 
 Then this axis-aligned ellipsoid undergoes a rigid transformation (i.e. one that preserves length and angles, such as a rotation/reflection) given by $\mat{Q}$.
 The result of this transformation is that the axes of the ellipse are no longer along the coordinate axes in general, but rather along the directions given by the corresponding eigenvectors.
-To see this, consider the unit vector $\vec{e}_i \in \R^d$ that has $[\vec{e}_i]_j = \delta_{ij}$.
+To see this, consider the unit vector $\vec{e}_i \in \R^n$ that has $[\vec{e}_i]_j = \delta_{ij}$.
 In the pre-transformed space, this vector points along the axis with length proportional to $\lambda_i\neghalfpow$.
 But after applying the rigid transformation $\mat{Q}$, the resulting vector points in the direction of the corresponding eigenvector $\q_i$, since
-\[\mat{Q}\vec{e}_i = \sum_{j=1}^d [e_i]_j\q_j = \q_i\]
+\[\mat{Q}\vec{e}_i = \sum_{j=1}^n [\vec{e}_i]_j\q_j = \q_i\]
 where we have used the matrix-vector product identity from earlier.
 
 In summary: the isocontours of $f(\x) = \x\tran\A\x$ are ellipsoids such that the axes point in the directions of the eigenvectors of $\A$, and the radii of these axes are proportional to the inverse square roots of the corresponding eigenvalues.
+
+\subsection{Singular value decomposition}
+Singular value decomposition (SVD) is a widely applicable tool in linear algebra.
+Its strength stems partially from the fact that \textit{every matrix} $\A \in \R^{m \times n}$ has an SVD (even non-square matrices)!
+The decomposition goes as follows:
+\[\A = \mat{U}\mat{\Sigma}\mat{V}\tran\]
+where $\mat{U} \in \R^{m \times m}$ and $\mat{V} \in \R^{n \times n}$ are orthogonal matrices and $\mat{\Sigma} \in \R^{m \times n}$ is a diagonal matrix with the \term{singular values} of $\A$ (denoted $\sigma_i$) on its diagonal.
+
+By convention, the singular values are given in non-increasing order, i.e.
+\[\sigma_1 \geq \sigma_2 \geq \dots \geq \sigma_{\min(m,n)} \geq 0\]
+Only the first $r$ singular values are nonzero, where $r$ is the rank of $\A$.
+
+Observe that the SVD factors provide eigendecompositions for $\A\tran\A$ and $\A\A\tran$:
+\begin{align*}
+\A\tran\A &= (\mat{U}\mat{\Sigma}\mat{V}\tran)\tran\mat{U}\mat{\Sigma}\mat{V}\tran = \mat{V}\mat{\Sigma}\tran\mat{U}\tran\mat{U}\mat{\Sigma}\mat{V}\tran = \mat{V}\mat{\Sigma}\tran\mat{\Sigma}\mat{V}\tran \\
+\A\A\tran &= \mat{U}\mat{\Sigma}\mat{V}\tran(\mat{U}\mat{\Sigma}\mat{V}\tran)\tran = \mat{U}\mat{\Sigma}\mat{V}\tran\mat{V}\mat{\Sigma}\tran\mat{U}\tran = \mat{U}\mat{\Sigma}\mat{\Sigma}\tran\mat{U}\tran
+\end{align*}
+It follows immediately that the columns of $\mat{V}$ (the \term{right-singular vectors} of $\A$) are eigenvectors of $\A\tran\A$, and the columns of $\mat{U}$ (the \term{left-singular vectors} of $\A$) are eigenvectors of $\A\A\tran$.
+
+The matrices $\mat{\Sigma}\tran\mat{\Sigma}$ and $\mat{\Sigma}\mat{\Sigma}\tran$ are not necessarily the same size, but both are diagonal with the squared singular values $\sigma_i^2$ on the diagonal (plus possibly some zeros).
+Thus the singular values of $\A$ are the square roots of the eigenvalues of $\A\tran\A$ (or equivalently, of $\A\A\tran$)\footnote{
+	Recall that $\A\tran\A$ and $\A\A\tran$ are positive semi-definite, so their eigenvalues are nonnegative, and thus taking square roots is always well-defined.
+}.
+
+\subsection{Some useful matrix identities}
+\subsubsection{Matrix-vector product as linear combination of matrix columns}
+\begin{proposition}
+Let $\x \in \R^n$ be a vector and $\A \in \R^{m \times n}$ a matrix with columns $\a_1, \dots, \a_n$.
+Then
+\[\A\x = \sum_{i=1}^n x_i\a_i\]
+\end{proposition}
+This identity is extremely useful in understanding linear operators in terms of their matrices' columns.
+The proof is very simple (consider each element of $\A\x$ individually and expand by definitions) but it is a good exercise to convince yourself.
+
+\subsubsection{Sum of outer products as matrix-matrix product}
+An \term{outer product} is an expression of the form $\a\b\tran$, where $\a \in \R^m$ and $\b \in \R^n$.
+By inspection it is not hard to see that such an expression yields an $m \times n$ matrix such that
+\[[\a\b\tran]_{ij} = a_ib_j\]
+It is not immediately obvious, but the sum of outer products is actually equivalent to an appropriate matrix-matrix product!
+We formalize this statement as
+\begin{proposition}
+Let $\a_1, \dots, \a_k \in \R^m$ and $\b_1, \dots, \b_k \in \R^n$. Then
+\[\sum_{\ell=1}^k \a_\ell\b_\ell\tran = \mat{A}\mat{B}\tran\]
+where
+\[\mat{A} = \matlit{\a_1 & \cdots & \a_k}, \tab \mat{B} = \matlit{\b_1 & \cdots & \b_k}\]
+\end{proposition}
+\begin{proof}
+For each $(i,j)$, we have
+\[\left[\sum_{\ell=1}^k \a_\ell\b_\ell\tran\right]_{ij} = \sum_{\ell=1}^k [\a_\ell\b_\ell\tran]_{ij} = \sum_{\ell=1}^k [\a_\ell]_i[\b_\ell]_j = \sum_{\ell=1}^k A_{i\ell}B_{j\ell}\]
+This last expression should be recognized as an inner product between the $i$th row of $\A$ and the $j$th row of $\mat{B}$, or equivalently the $j$th column of $\mat{B}\tran$.
+Hence by the definition of matrix multiplication, it is equal to $[\mat{A}\mat{B}\tran]_{ij}$.
+\end{proof}
+
+\subsubsection{Quadratic forms}
+Let $\A \in \R^{n \times n}$ be a symmetric matrix, and recall that the expression $\x\tran\A\x$ is called a quadratic form of $\A$.
+It is in some cases helpful to rewrite the quadratic form in terms of the individual elements that make up $\A$ and $\x$:
+\[\x\tran\A\x = \sum_{i=1}^n\sum_{j=1}^n A_{ij}x_ix_j\]
+This identity is valid for any square matrix (need not be symmetric), although quadratic forms are usually only discussed in the context of symmetric matrices.
